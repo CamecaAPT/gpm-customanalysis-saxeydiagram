@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0-windows7.0</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<Platforms>x64</Platforms>
+		<Nullable>enable</Nullable>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<RootNamespace>GPM.CustomAnalysis.SaxeyDiagram</RootNamespace>
+		<AssemblyName>GPM.CustomAnalysis.SaxeyDiagram</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup Label="Package">
+		<Authors>Groupe de Physique des Matériaux,CAMECA Instruments Inc.</Authors>
+		<Description>Custom analysis to display a multi-hit event correlation table</Description>
+		<Copyright>Copyright 2022 © Groupe de Physique des Matériaux and CAMECA Instruments Inc. All rights reserved.</Copyright>
+	</PropertyGroup>
+
+	<ItemGroup Label="Package Dependencies">
+		<PackageReference Include="Cameca.CustomAnalysis.Interface" Version="0.1.0-alpha.18" />
+	</ItemGroup>
+
+</Project>
