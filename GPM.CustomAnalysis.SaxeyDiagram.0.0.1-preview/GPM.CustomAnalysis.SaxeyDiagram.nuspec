@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>GPM.CustomAnalysis.SaxeyDiagram</id>
+    <version>0.0.1-preview</version>
+    <title>GPM.CustomAnalysis.SaxeyDiagram</title>
+    <authors>Groupe de Physique des Matériaux,CAMECA Instruments Inc.</authors>
+    <description>Custom analysis to display a multi-hit event correlation table</description>
+    <copyright>Copyright 2022 © Groupe de Physique des Matériaux and CAMECA Instruments Inc. All rights reserved.</copyright>
+    <repository type="git" url="https://github.com/CamecaAPT/gpm-customanalysis-saxeydiagram.git" commit="2426efa787850a5138546acd3b66ce30bdaef34a" />
+    <dependencies>
+      <group targetFramework="net5.0-windows7.0">
+        <dependency id="Cameca.CustomAnalysis.Interface" version="[0.1.0-alpha.16, 0.1.0-alpha.19]" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkReferences>
+      <group targetFramework="net5.0-windows7.0">
+        <frameworkReference name="Microsoft.WindowsDesktop.App.WPF" />
+      </group>
+    </frameworkReferences>
+  </metadata>
+</package>

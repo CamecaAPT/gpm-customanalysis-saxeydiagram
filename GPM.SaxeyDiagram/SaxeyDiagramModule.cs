@@ -1,24 +1,25 @@
-﻿using System;
-using Cameca.CustomAnalysis.Interface.CustomAnalysis;
+﻿using Cameca.CustomAnalysis.Interface;
+using Cameca.CustomAnalysis.Utilities;
 using Prism.Ioc;
 using Prism.Modularity;
 
-namespace GPM.CustomAnalysis.SaxeyDiagram
+namespace GPM.CustomAnalysis.SaxeyDiagram;
+
+public class SaxeyDiagramModule : IModule
 {
-    [ModuleDependency("IvasModule")]
-    public class SaxeyDiagramModule : IModule
+    public void RegisterTypes(IContainerRegistry containerRegistry)
     {
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            // Register any additional dependencies with the Unity IoC container
-        }
+        containerRegistry.RegisterCoreServices();
 
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            var customAnalysisService = containerProvider.Resolve<ICustomAnalysisService>();
+        containerRegistry.Register<object, SaxeyDiagramNode>(SaxeyDiagramNode.UniqueId);
+        containerRegistry.RegisterInstance<INodeDisplayInfo>(SaxeyDiagramNode.DisplayInfo, SaxeyDiagramNode.UniqueId);
+        containerRegistry.Register<IAnalysisMenuFactory, SaxeyDiagramNodeMenuFactory>(SaxeyDiagramNodeMenuFactory.UniqueId);
+        containerRegistry.Register<object, SaxeyDiagramViewModel>(SaxeyDiagramViewModel.UniqueId);
+    }
 
-            customAnalysisService.Register<SaxeyDiagramCustomAnalysis, SaxeyDiagramOptions>(
-                new CustomAnalysisDescription("GPM_SaxeyDiagram", "GPM Saxey Diagram", new Version()));
-        }
+    public void OnInitialized(IContainerProvider containerProvider)
+    {
+        var extensionRegistry = containerProvider.Resolve<IExtensionRegistry>();
+        extensionRegistry.RegisterAnalysisView<SaxeyDiagramView, SaxeyDiagramViewModel>(AnalysisViewLocation.Top);
     }
 }
