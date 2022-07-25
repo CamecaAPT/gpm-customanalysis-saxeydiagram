@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Cameca.CustomAnalysis.Interface;
-using Cameca.CustomAnalysis.Interface.Resources.IonData;
 using Cameca.CustomAnalysis.Utilities;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Xml.Serialization;
 using Cameca.CustomAnalysis.Interface;
-using Cameca.CustomAnalysis.Interface.Resources.IonData;
 using Cameca.CustomAnalysis.Utilities;
 using Microsoft.Toolkit.HighPerformance;
 
@@ -67,22 +66,22 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 		return Encoding.UTF8.GetBytes(stringWriter.ToString());
 	}
 
-	protected override void OnLoaded(NodeLoadedEventArgs eventArgs)
-	{
-		if (eventArgs.Data is not { } data) return;
-		var xmlData = Encoding.UTF8.GetString(data);
-		var serializer = new XmlSerializer(typeof(SaxeyDiagramOptions));
-		using var stringReader = new StringReader(xmlData);
-		if (serializer.Deserialize(stringReader) is SaxeyDiagramOptions loadedOptions)
-		{
-			Options = loadedOptions;
-		}
-	}
+    protected override void OnCreated(NodeCreatedEventArgs eventArgs)
+    {
+        base.OnCreated(eventArgs);
 
-	protected override void OnInstantiated(INodeInstantiatedEventArgs eventArgs)
-	{
-		base.OnInstantiated(eventArgs);
-		Options.PropertyChanged += OptionsOnPropertyChanged;
+        Options.PropertyChanged += OptionsOnPropertyChanged;
+
+		if (eventArgs.Trigger == EventTrigger.Load && eventArgs.Data is { } data)
+        {
+            var xmlData = Encoding.UTF8.GetString(data);
+            var serializer = new XmlSerializer(typeof(SaxeyDiagramOptions));
+            using var stringReader = new StringReader(xmlData);
+            if (serializer.Deserialize(stringReader) is SaxeyDiagramOptions loadedOptions)
+            {
+            	Options = loadedOptions;
+            }
+		}
 	}
 
 	private void OptionsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
