@@ -29,8 +29,14 @@
 		<RepositoryUrl>https://github.com/CamecaAPT/gpm-customanalysis-saxeydiagram</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<IncludeBuildOutput>true</IncludeBuildOutput>
-		<NuspecFile>GPM.SaxeyDiagram.nuspec</NuspecFile>
+		<NuspecFile>$(AssemblyName).nuspec</NuspecFile>
 		<NuspecProperties>id=$(AssemblyName);version=$(Version);title=$(Title);authors=$(Authors);company=$(Company);license=$(PackageLicenseFile);readme=$(PackageReadmeFile);description=$(Description);copyright=$(Copyright);repo_type=$(RepositoryType);repo_url=$(RepositoryUrl);tfw=$(TargetFramework);outdir=$(OutputPath)</NuspecProperties>
+	</PropertyGroup>
+	
+	<PropertyGroup Label="Direct Output" Condition="'$(Configuration)' == 'Debug'">
+		<OutputPath>$(LOCALAPPDATA)\CAMECA\AP Suite\Extensions\$(AssemblyName)</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup Label="Package Dependencies">
