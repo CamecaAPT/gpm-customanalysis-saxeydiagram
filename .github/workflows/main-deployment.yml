@@ -62,7 +62,7 @@ jobs:
         run: >
           dotnet build
           --no-restore
-          --output .\bin\
+          --output .\bin
           --configuration $env:BUILD_CONFIGURATION
           /p:Version=$env:GitVersion_SemVer
           --nologo
@@ -72,7 +72,7 @@ jobs:
         run: >
           dotnet test
           --no-build
-          --output .\bin\
+          --output .\bin
           --configuration $env:BUILD_CONFIGURATION
           --verbosity normal
           --nologo
@@ -85,7 +85,7 @@ jobs:
           --configuration $env:BUILD_CONFIGURATION
           --include-symbols
           /p:Version=$env:GitVersion_SemVer
-          /p:OutputPath=.\bin\
+          /p:OutputPath=.\bin
           --output .
 
       - name: Push (Package)
