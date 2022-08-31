@@ -22,15 +22,17 @@
 		<Copyright>Copyright 2022 © Groupe de Physique des Matériaux and CAMECA Instruments Inc. All rights reserved.</Copyright>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<RepositoryUrl>https://github.com/CamecaAPT/gpm-customanalysis-saxeydiagram</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
 		<IncludeBuildOutput>true</IncludeBuildOutput>
 		<NuspecFile>GPM.SaxeyDiagram.nuspec</NuspecFile>
-		<NuspecProperties>id=$(AssemblyName);version=$(Version);title=$(Title);authors=$(Authors);company=$(Company);license=$(PackageLicenseFile);readme=$(PackageReadmeFile);description=$(Description);copyright=$(Copyright);repo_type=$(RepositoryType);repo_url=$(RepositoryUrl);tfw=$(TargetFramework);outdir=$(OutputPath)</NuspecProperties>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+		<Deterministic>true</Deterministic>
 	</PropertyGroup>
 
 	<ItemGroup Label="Package Dependencies">
@@ -44,4 +46,27 @@
 		<None Include="..\README.md" Pack="True" PackagePath="\" />
 		<None Include="..\LICENSE" Pack="True" PackagePath="\" />
 	</ItemGroup>
+
+	<!-- Nuspec Initiaization and Configuration -->
+	<Target Name="InitializeStandardNuspecProperties" BeforeTargets="GenerateNuspec" Condition="'$(IsPackable)' == 'true'">
+		<PropertyGroup Condition="'$(NuspecFile)' != '' and '$(NuspecProperties)' == ''">
+			<NuspecProperties>
+				id=$(AssemblyName);
+				version=$(Version);
+				title=$(Title);
+				authors=$(Authors);
+				company=$(Company);
+				license=$(PackageLicenseFile);
+				readme=$(PackageReadmeFile);
+				description=$(Description);
+				copyright=$(Copyright);
+				repoType=$(RepositoryType);
+				repoUrl=$(RepositoryUrl);
+				projectUrl=$(RepositoryUrl);
+				repoCommit=$(RepositoryCommit);
+				tfw=$(TargetFramework);
+				outDir=$(MSBuildThisFileDirectory)$(OutputPath)
+			</NuspecProperties>
+		</PropertyGroup>
+	</Target>
 </Project>

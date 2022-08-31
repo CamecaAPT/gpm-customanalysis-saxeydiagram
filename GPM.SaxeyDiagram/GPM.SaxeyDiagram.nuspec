@@ -11,7 +11,8 @@
 		<readme>$readme$</readme>
 		<description>$description$</description>
 		<copyright>$copyright$</copyright>
-		<repository type="$repo_type$" url="$repo_url$" />
+		<projectUrl>$projectUrl$</projectUrl>
+		<repository type="$repoType$" url="$repoUrl$" commit="$repoCommit$" />
 		<dependencies>
 			<group targetFramework="$tfw$" />
 		</dependencies>
@@ -19,6 +20,6 @@
 	<files>
 		<file src="..\LICENSE" target="LICENSE" />
 		<file src="..\README.md" target="README.md" />
-		<file src="..\$outdir$\*" target="lib\$tfw$" />
+		<file src="$outDir$*" target="lib\$tfw$" />
 	</files>
 </package>
