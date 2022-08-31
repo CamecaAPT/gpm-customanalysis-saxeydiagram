@@ -19,6 +19,6 @@
 	<files>
 		<file src="..\LICENSE" target="LICENSE" />
 		<file src="..\README.md" target="README.md" />
-		<file src="$outdir$\*" target="lib\$tfw$" />
+		<file src="..\$outdir$\*" target="lib\$tfw$" />
 	</files>
 </package>
