@@ -34,6 +34,12 @@
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 		<Deterministic>true</Deterministic>
 	</PropertyGroup>
+	
+	<PropertyGroup Label="Direct Output" Condition="'$(Configuration)' == 'Debug'">
+		<OutputPath>$(LOCALAPPDATA)\CAMECA\AP Suite\Extensions\$(AssemblyName)</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+	</PropertyGroup>
 
 	<ItemGroup Label="Package Dependencies">
 		<PackageReference Include="AsyncAwaitBestPractices.MVVM" Version="6.0.4" />
