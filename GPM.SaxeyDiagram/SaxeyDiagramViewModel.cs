@@ -23,7 +23,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	private readonly AsyncCommand runCommand;
 	public ICommand RunCommand => runCommand;
 
-	public SaxeyDiagramOptions Options => Node!.Options;
+	public SaxeyDiagramOptions Options => Node?.Options ?? new ();
 
 	public ObservableCollection<object> Tabs { get; } = new();
 	
@@ -70,7 +70,10 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		}
 		Tabs.Clear();
 
-		var data = await Node!.Run();
+		// This shouldn't happen but check for safety
+        if (Node is null) return;
+
+		var data = await Node.Run();
 
 		if (!data.HasValue)
 		{

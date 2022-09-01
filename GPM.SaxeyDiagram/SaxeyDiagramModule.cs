@@ -9,7 +9,7 @@ public class SaxeyDiagramModule : IModule
 {
     public void RegisterTypes(IContainerRegistry containerRegistry)
     {
-        containerRegistry.RegisterCoreServices();
+        containerRegistry.AddCustomAnalysisUtilities();
 
         containerRegistry.Register<object, SaxeyDiagramNode>(SaxeyDiagramNode.UniqueId);
         containerRegistry.RegisterInstance<INodeDisplayInfo>(SaxeyDiagramNode.DisplayInfo, SaxeyDiagramNode.UniqueId);

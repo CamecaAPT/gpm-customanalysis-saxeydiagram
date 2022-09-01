@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Cameca.CustomAnalysis.Interface;
-using Cameca.CustomAnalysis.Interface.Resources.IonData;
 using Cameca.CustomAnalysis.Utilities;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
@@ -11,14 +10,16 @@ namespace GPM.CustomAnalysis.SaxeyDiagram;
 internal class CSaxeyDiagram
 {
 	private int pixels;
-	private SaxeyDiagramOptions? options = null;
+
+	private SaxeyDiagramOptions? nullableOptions = null;
+    private SaxeyDiagramOptions options => nullableOptions ?? throw new InvalidOperationException($"{nameof(CSaxeyDiagram)}.{nameof(Build)} must be called before running this analysis");
 
 	public float[] Map { get; private set; } = Array.Empty<float>();
 
-	public void Build(SaxeyDiagramOptions options, IIonData ionData, bool hasMultiplicity)
+	public void Build(SaxeyDiagramOptions saxeyDiagramOptions, IIonData ionData, bool hasMultiplicity)
 	{
-		this.options = options;
-		pixels = (this.options.EdgeSize + 2) * (this.options.EdgeSize + 2);
+        nullableOptions = saxeyDiagramOptions;
+		pixels = (options.EdgeSize + 2) * (options.EdgeSize + 2);
 		Map = new float[pixels];
 
 		if (hasMultiplicity)
@@ -161,7 +162,7 @@ internal class CSaxeyDiagram
 		int events = multiEventMasses.Count;
 
 		// Treat selected type of events
-		if (options!.EventSelections.Plot(events))
+		if (options.EventSelections.Plot(events))
 		{
 			for (int j = 0; j < events - 1; j++)
 			for (int k = j + 1; k < events; k++)
@@ -205,7 +206,7 @@ internal class CSaxeyDiagram
 
 		try
 		{
-			float fResolution = options!.MassExtent / (float)options.EdgeSize;
+			float fResolution = options.MassExtent / (float)options.EdgeSize;
 			using var writer = new StreamWriter(filename);
 			Console.WriteLine("a");
 			for (int j = 0; j < options.EdgeSize; j++)
