@@ -51,7 +51,6 @@ packages/*
 *.vspscc
 *.vssscc.builds
 *.pidb
-*.log
 *.scc
 *.tlog
 *.exp
@@ -89,6 +88,7 @@ ipch/
 */*/*/debug/*
 */Assemblies/*
 x64/
+bin/
 build/
 Build Logs/
 obj/
