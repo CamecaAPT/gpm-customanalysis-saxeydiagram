@@ -6,9 +6,9 @@ using System.Numerics;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
-using AsyncAwaitBestPractices.MVVM;
 using Cameca.CustomAnalysis.Interface;
 using Cameca.CustomAnalysis.Utilities;
+using CommunityToolkit.Mvvm.Input;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
 
@@ -20,7 +20,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	private readonly IColorMap colorMap;
 	private bool optionsChanged = false;
 
-	private readonly AsyncCommand runCommand;
+	private readonly AsyncRelayCommand runCommand;
 	public ICommand RunCommand => runCommand;
 
 	public SaxeyDiagramOptions Options => Node?.Options ?? new ();
@@ -40,7 +40,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		IColorMapFactory colorMapFactory) : base(services)
 	{
 		this.renderDataFactory = renderDataFactory;
-		runCommand = new AsyncCommand(OnRun, UpdateSelectedEventCountsEnabled);
+		runCommand = new AsyncRelayCommand(OnRun, UpdateSelectedEventCountsEnabled);
 		colorMap = CreateBrightColorMap(colorMapFactory);
 	}
 
@@ -106,7 +106,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		else
 		{
 			optionsChanged = true;
-			runCommand.RaiseCanExecuteChanged();
+			runCommand.NotifyCanExecuteChanged();
 		}
 	}
 
@@ -114,7 +114,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		=> optionsChanged = true;
 
 
-	private bool UpdateSelectedEventCountsEnabled(object? _) => !Tabs.Any() || optionsChanged;
+	private bool UpdateSelectedEventCountsEnabled() => !Tabs.Any() || optionsChanged;
 
 	private IColorMap CreateBrightColorMap(IColorMapFactory colorMapFactory) => colorMapFactory.CreateColorMap(
 		outOfRangeTop: Colors.DeepPink,
