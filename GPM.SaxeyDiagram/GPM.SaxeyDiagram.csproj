@@ -27,7 +27,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<IncludeBuildOutput>true</IncludeBuildOutput>
-		<NuspecFile>GPM.CustomAnalysis.SaxeyDiagram</NuspecFile>
+		<NuspecFile>GPM.CustomAnalysis.SaxeyDiagram.nuspec</NuspecFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
