@@ -79,7 +79,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		{
 			var errorViewModel = new TextContentViewModel(
 				"Error",
-				"Missing section(s) in the APT file.  \"Mass\" and \"Multiplicity\" are required.");
+				"Missing section(s) in the APT file.  \"Multiplicity\" or \"pulse\" is required.");
 			Tabs.Add(errorViewModel);
 			SelectedTab = errorViewModel;
 			return;
