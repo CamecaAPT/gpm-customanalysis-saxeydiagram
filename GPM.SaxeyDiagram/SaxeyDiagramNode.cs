@@ -7,7 +7,7 @@ using System.Windows.Media;
 using System.Xml.Serialization;
 using Cameca.CustomAnalysis.Interface;
 using Cameca.CustomAnalysis.Utilities;
-using Microsoft.Toolkit.HighPerformance;
+using CommunityToolkit.HighPerformance;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
 

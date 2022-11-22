@@ -6,9 +6,9 @@ using System.Numerics;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
-using AsyncAwaitBestPractices.MVVM;
 using Cameca.CustomAnalysis.Interface;
 using Cameca.CustomAnalysis.Utilities;
+using CommunityToolkit.Mvvm.Input;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
 
@@ -20,7 +20,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	private readonly IColorMap colorMap;
 	private bool optionsChanged = false;
 
-	private readonly AsyncCommand runCommand;
+	private readonly AsyncRelayCommand runCommand;
 	public ICommand RunCommand => runCommand;
 
 	public SaxeyDiagramOptions Options => Node?.Options ?? new ();
@@ -40,7 +40,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		IColorMapFactory colorMapFactory) : base(services)
 	{
 		this.renderDataFactory = renderDataFactory;
-		runCommand = new AsyncCommand(OnRun, UpdateSelectedEventCountsEnabled);
+		runCommand = new AsyncRelayCommand(OnRun, UpdateSelectedEventCountsEnabled);
 		colorMap = CreateBrightColorMap(colorMapFactory);
 	}
 
@@ -79,7 +79,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		{
 			var errorViewModel = new TextContentViewModel(
 				"Error",
-				"Missing section(s) in the APT file.  \"Mass\" and \"Multiplicity\" are required.");
+				"Missing section(s) in the APT file.  \"Multiplicity\" or \"pulse\" is required.");
 			Tabs.Add(errorViewModel);
 			SelectedTab = errorViewModel;
 			return;
@@ -89,7 +89,8 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			data.Value,
 			new Vector2(Options.Resolution, Options.Resolution),
 			colorMap,
-			new Vector2(Options.XMin, Options.YMin));
+			new Vector2(Options.XMin, Options.YMin),
+			minValue: CSaxeyDiagram.MinBinValueInclusive);
 		var histogram2DViewModel = new Histogram2DContentViewModel(
 			"Saxey Diagram",
 			renderData);
@@ -101,12 +102,12 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	{
 		if (e.PropertyName == nameof(SaxeyDiagramOptions.PlotZeroAsWhite))
 		{
-			colorMap.NanColor = Options.PlotZeroAsWhite ? Colors.White : colorMap.Bottom;
+			colorMap.OutOfRangeBottom = Options.PlotZeroAsWhite ? Colors.White : colorMap.Bottom;
 		}
 		else
 		{
 			optionsChanged = true;
-			runCommand.RaiseCanExecuteChanged();
+			runCommand.NotifyCanExecuteChanged();
 		}
 	}
 
@@ -114,7 +115,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		=> optionsChanged = true;
 
 
-	private bool UpdateSelectedEventCountsEnabled(object? _) => !Tabs.Any() || optionsChanged;
+	private bool UpdateSelectedEventCountsEnabled() => !Tabs.Any() || optionsChanged;
 
 	private IColorMap CreateBrightColorMap(IColorMapFactory colorMapFactory) => colorMapFactory.CreateColorMap(
 		outOfRangeTop: Colors.DeepPink,
