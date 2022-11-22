@@ -89,7 +89,8 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			data.Value,
 			new Vector2(Options.Resolution, Options.Resolution),
 			colorMap,
-			new Vector2(Options.XMin, Options.YMin));
+			new Vector2(Options.XMin, Options.YMin),
+			minValue: CSaxeyDiagram.MinBinValueInclusive);
 		var histogram2DViewModel = new Histogram2DContentViewModel(
 			"Saxey Diagram",
 			renderData);
@@ -101,7 +102,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	{
 		if (e.PropertyName == nameof(SaxeyDiagramOptions.PlotZeroAsWhite))
 		{
-			colorMap.NanColor = Options.PlotZeroAsWhite ? Colors.White : colorMap.Bottom;
+			colorMap.OutOfRangeBottom = Options.PlotZeroAsWhite ? Colors.White : colorMap.Bottom;
 		}
 		else
 		{
