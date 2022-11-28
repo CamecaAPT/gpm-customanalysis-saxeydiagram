@@ -9,16 +9,19 @@ namespace GPM.CustomAnalysis.SaxeyDiagram;
 
 internal class CSaxeyDiagram
 {
+	public const float MinBinValueInclusive = 0.0001f;
+	public const float ReplacedOutOfRangeBinValue = 0f;
+
 	private int pixels;
 
 	private SaxeyDiagramOptions? nullableOptions = null;
-    private SaxeyDiagramOptions options => nullableOptions ?? throw new InvalidOperationException($"{nameof(CSaxeyDiagram)}.{nameof(Build)} must be called before running this analysis");
+	private SaxeyDiagramOptions options => nullableOptions ?? throw new InvalidOperationException($"{nameof(CSaxeyDiagram)}.{nameof(Build)} must be called before running this analysis");
 
 	public float[] Map { get; private set; } = Array.Empty<float>();
 
 	public void Build(SaxeyDiagramOptions saxeyDiagramOptions, IIonData ionData, bool hasMultiplicity)
 	{
-        nullableOptions = saxeyDiagramOptions;
+		nullableOptions = saxeyDiagramOptions;
 		pixels = (options.EdgeSize + 2) * (options.EdgeSize + 2);
 		Map = new float[pixels];
 
@@ -33,7 +36,7 @@ internal class CSaxeyDiagram
 
 		NormalizeMap();
 
-		OverwriteMinWithNaN();
+		ReplaceLowerValues(MinBinValueInclusive, ReplacedOutOfRangeBinValue);
 	}
 
 	private void BuildFromMultiplicitySection(IIonData ionData)
@@ -146,12 +149,14 @@ internal class CSaxeyDiagram
 	}
 
 
-	private void OverwriteMinWithNaN(float minCutoff = 0.0001f)
+	private void ReplaceLowerValues(float minCutoff, float replaceValue)
 	{
 		for (int i = 0; i < pixels; i++)
 		{
 			if (Map[i] < minCutoff)
-				Map[i] = float.NaN;
+			{
+				Map[i] = replaceValue;
+			}
 		}
 	}
 
@@ -200,7 +205,6 @@ internal class CSaxeyDiagram
 	/// </summary>
 	/// <param name="filename"></param>
 	/// <param name="error">Error text if failure (CSV open, for instance)</param>
-	/// <param name="options"></param>
 	internal bool ExportToCsvTable(string filename, [NotNullWhen(false)] out string? error)
 	{
 
