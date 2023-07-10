@@ -37,6 +37,9 @@ internal class CSaxeyDiagram
 		NormalizeMap();
 
 		ReplaceLowerValues(MinBinValueInclusive, ReplacedOutOfRangeBinValue);
+
+		if (!options.MirrorPlot)
+			RemoveBottomHalf();
 	}
 
 	private void BuildFromMultiplicitySection(IIonData ionData)
@@ -156,6 +159,19 @@ internal class CSaxeyDiagram
 			if (Map[i] < minCutoff)
 			{
 				Map[i] = replaceValue;
+			}
+		}
+	}
+
+	private void RemoveBottomHalf()
+	{
+		for(int i=0; i<options.EdgeSize; i++)
+		{
+			for(int j=0; j<options.EdgeSize; j++)
+			{
+				int index = i*options.EdgeSize + j;
+				if (j < i)
+					Map[index] = 0.0f;
 			}
 		}
 	}

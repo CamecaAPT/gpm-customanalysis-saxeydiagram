@@ -73,4 +73,12 @@ public class SaxeyDiagramOptions : BindableBase
 		get => exportToCsv;
 		set => SetProperty(ref exportToCsv, value);
 	}
+
+	private bool mirrorPlot = false;
+	[Display(Name = "Mirror Plot", Description = "Leave the bottom half of the plot blank or have a copy of the top reflected.")]
+	public bool MirrorPlot
+	{
+		get => mirrorPlot;
+		set => SetProperty(ref mirrorPlot, value);
+	}
 }
