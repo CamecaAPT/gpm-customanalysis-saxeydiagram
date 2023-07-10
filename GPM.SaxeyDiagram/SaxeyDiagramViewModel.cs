@@ -75,7 +75,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 		var data = await Node.Run();
 
-		if (!data.HasValue)
+		if (data == null)
 		{
 			var errorViewModel = new TextContentViewModel(
 				"Error",
@@ -84,9 +84,11 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			SelectedTab = errorViewModel;
 			return;
 		}
+
+		var saxeyData = data[0];
 		
 		var renderData = renderDataFactory.CreateHistogram2D(
-			data.Value,
+			saxeyData,
 			new Vector2(Options.Resolution, Options.Resolution),
 			colorMap,
 			new Vector2(Options.XMin, Options.YMin),
@@ -94,6 +96,9 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		var histogram2DViewModel = new Histogram2DContentViewModel(
 			"Saxey Diagram",
 			renderData);
+		
+
+
 		Tabs.Add(histogram2DViewModel);
 		SelectedTab = histogram2DViewModel;
 	}

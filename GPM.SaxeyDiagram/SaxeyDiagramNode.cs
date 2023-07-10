@@ -30,8 +30,10 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 	public SaxeyDiagramOptions Options { get; private set; } = new();
 
-	public async Task<ReadOnlyMemory2D<float>?> Run()
+	public async Task<List<ReadOnlyMemory2D<float>>?> Run()
 	{
+		List<ReadOnlyMemory2D<float>> toRet = new();
+
 		if (await Services.IonDataProvider.GetIonData(InstanceId) is not { } ionData)
 			return null;
 
@@ -55,7 +57,9 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 			saxey.ExportToCsvTable(csvName, out string? err);
 		}
 
-		return new ReadOnlyMemory2D<float>(saxey.Map, Options.EdgeSize, Options.EdgeSize);
+		toRet.Add(new ReadOnlyMemory2D<float>(saxey.Map, Options.EdgeSize, Options.EdgeSize));
+
+		return toRet;
 	}
 
 	protected override byte[]? GetSaveContent()
