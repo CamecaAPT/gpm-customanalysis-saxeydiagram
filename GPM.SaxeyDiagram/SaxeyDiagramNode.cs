@@ -30,9 +30,9 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 	public SaxeyDiagramOptions Options { get; private set; } = new();
 
-	public async Task<List<ReadOnlyMemory2D<float>>?> Run()
+	public async Task<List<object>?> Run()
 	{
-		List<ReadOnlyMemory2D<float>> toRet = new();
+		List<object> toRet = new();
 
 		if (await Services.IonDataProvider.GetIonData(InstanceId) is not { } ionData)
 			return null;
@@ -51,13 +51,19 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 		// Build Saxey diagram
 		saxey.Build(Options, ionData, hasMultiplicity);
 
+		toRet.Add(new ReadOnlyMemory2D<float>(saxey.Map, Options.EdgeSize, Options.EdgeSize));
+
+		var sqrtChart = SaxeyAddons.BuildSqrtChart(saxey.Map, Options.EdgeSize, Options.Resolution, out var newResolution);
+
+		toRet.Add(sqrtChart);
+		toRet.Add(newResolution);
+
 		if (Options.ExportToCsv)
 		{
 			var csvName = ionData.Filename + ".SP.csv";
 			saxey.ExportToCsvTable(csvName, out string? err);
 		}
 
-		toRet.Add(new ReadOnlyMemory2D<float>(saxey.Map, Options.EdgeSize, Options.EdgeSize));
 
 		return toRet;
 	}

@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Cameca.CustomAnalysis.Interface;
 using Cameca.CustomAnalysis.Utilities;
+using CommunityToolkit.HighPerformance;
 using CommunityToolkit.Mvvm.Input;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
@@ -85,7 +86,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			return;
 		}
 
-		var saxeyData = data[0];
+		ReadOnlyMemory2D<float> saxeyData = (ReadOnlyMemory2D<float>)data[0];
 		
 		var renderData = renderDataFactory.CreateHistogram2D(
 			saxeyData,
@@ -96,10 +97,21 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		var histogram2DViewModel = new Histogram2DContentViewModel(
 			"Saxey Diagram",
 			renderData);
-		
-
-
 		Tabs.Add(histogram2DViewModel);
+
+		ReadOnlyMemory2D<float> sqrtData = (ReadOnlyMemory2D<float>)data[1];
+		float newResolution = (float)data[2];
+		var sqrtRenderData = renderDataFactory.CreateHistogram2D(
+			sqrtData,
+			new Vector2(newResolution, newResolution),
+			colorMap,
+			new Vector2(Options.XMin, Options.YMin),
+			minValue: CSaxeyDiagram.MinBinValueInclusive);
+		var sqrtHistogramViewModel = new Histogram2DContentViewModel(
+			"Time Space Saxey Diagram",
+			sqrtRenderData);
+		Tabs.Add(sqrtHistogramViewModel);
+
 		SelectedTab = histogram2DViewModel;
 	}
 
