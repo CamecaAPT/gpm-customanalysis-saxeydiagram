@@ -53,7 +53,9 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 		toRet.Add(new ReadOnlyMemory2D<float>(saxey.Map, Options.EdgeSize, Options.EdgeSize));
 
-		var sqrtChart = SaxeyAddons.BuildSqrtChart(saxey.Map, Options.EdgeSize, Options.Resolution, out var newResolution);
+		//var sqrtChart = SaxeyAddons.BuildSqrtChart(saxey.Map, Options.EdgeSize, Options.Resolution, out var newResolution);
+
+		var sqrtChart = SaxeyAddons.BuildSqrtChart(saxey.Points, Options.EdgeSize, Options.Resolution, out var newResolution);
 
 		toRet.Add(sqrtChart);
 		toRet.Add(newResolution);

@@ -56,10 +56,27 @@
                                HorizontalAlignment="Left"
                                TextWrapping="WrapWithOverflow" />
                 </DataTemplate>
+                <DataTemplate DataType="{x:Type local:Histogram2DHistogram1DSideBySideViewModel}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <controls:Histogram2D DataSource="{Binding Histogram2DRenderData}"
+                                          AxisXLabel="sqrt(M/n) (da)"
+                                          AxisYLabel="sqrt(M/n) (da)" 
+                              Grid.Column ="0"/>
+                        <controls:Histogram2D DataSource="{Binding Histogram1DRenderData}"
+                                          AxisXLabel="PUTLABEL (da)"
+                                          AxisYLabel="PUTLABEL (da)" 
+                              Grid.Column ="1"/>
+
+                    </Grid>
+                </DataTemplate>
                 <DataTemplate DataType="{x:Type local:Histogram2DContentViewModel}">
                     <controls:Histogram2D DataSource="{Binding Histogram2DRenderData}"
                                           AxisXLabel="M/n (da)"
-                                          AxisYLabel="M/n (da)" />
+                                          AxisYLabel="M/n (da)"/>
                 </DataTemplate>
             </TabControl.Resources>
         </TabControl>

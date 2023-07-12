@@ -107,10 +107,10 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			colorMap,
 			new Vector2(Options.XMin, Options.YMin),
 			minValue: CSaxeyDiagram.MinBinValueInclusive);
-		var sqrtHistogramViewModel = new Histogram2DContentViewModel(
-			"Time Space Saxey Diagram",
-			sqrtRenderData);
-		Tabs.Add(sqrtHistogramViewModel);
+		var saxeyAddonsViewModel = new Histogram2DHistogram1DSideBySideViewModel(
+			"Time Space and Multi Atom Mass Spectrum",
+			sqrtRenderData, sqrtRenderData);
+		Tabs.Add(saxeyAddonsViewModel);
 
 		SelectedTab = histogram2DViewModel;
 	}

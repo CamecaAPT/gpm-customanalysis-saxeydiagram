@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Numerics;
 using Cameca.CustomAnalysis.Interface;
 using Cameca.CustomAnalysis.Utilities;
 
@@ -18,6 +19,7 @@ internal class CSaxeyDiagram
 	private SaxeyDiagramOptions options => nullableOptions ?? throw new InvalidOperationException($"{nameof(CSaxeyDiagram)}.{nameof(Build)} must be called before running this analysis");
 
 	public float[] Map { get; private set; } = Array.Empty<float>();
+	public List<Vector2> Points { get; private set; } = new();
 
 	public void Build(SaxeyDiagramOptions saxeyDiagramOptions, IIonData ionData, bool hasMultiplicity)
 	{
@@ -34,7 +36,8 @@ internal class CSaxeyDiagram
 			BuildFromPulseSection(ionData);
 		}
 
-		NormalizeMap();
+		Log10ScaleTransformation(Map);
+		NormalizeMap(Map);
 
 		ReplaceLowerValues(MinBinValueInclusive, ReplacedOutOfRangeBinValue);
 
@@ -134,20 +137,27 @@ internal class CSaxeyDiagram
 		}
 	}
 
-	private void NormalizeMap()
+	private static void NormalizeMap(float[] histogramArray)
 	{
 		// Adjust amplitude of Map memory
 		float fMaxValue = 0;
-		for (int i = 0; i < pixels; i++)
+		for (int i = 0; i < histogramArray.Length; i++)
 		{
-			if (Map[i] > 0)
-				Map[i] = (float)Math.Log10(1 + Map[i]);
-			fMaxValue = Math.Max(Map[i], fMaxValue);
+			fMaxValue = Math.Max(histogramArray[i], fMaxValue);
 		}
 
-		for (int i = 0; i < pixels; i++)
+		for (int i = 0; i < histogramArray.Length; i++)
 		{
-			Map[i] *= 100 / fMaxValue;
+			histogramArray[i] /= fMaxValue;
+		}
+	}
+
+	private static void Log10ScaleTransformation(float[] histogramArray)
+	{
+		for (int i = 0; i < histogramArray.Length; i++)
+		{
+			if (histogramArray[i] > 0)
+				histogramArray[i] = (float)Math.Log10(1 + histogramArray[i]);
 		}
 	}
 
@@ -186,30 +196,37 @@ internal class CSaxeyDiagram
 		if (options.EventSelections.Plot(events))
 		{
 			for (int j = 0; j < events - 1; j++)
-			for (int k = j + 1; k < events; k++)
-			{
-				if (multiEventMasses[j] >= options.XMin && multiEventMasses[j] < options.XMin + options.MassExtent)
-					if (multiEventMasses[k] >= options.YMin && multiEventMasses[k] < options.YMin + options.MassExtent)
-					{
-						int b = (int)((multiEventMasses[j] - options.XMin) / options.Resolution);
-						int a = (int)((multiEventMasses[k] - options.YMin) / options.Resolution);
+				for (int k = j + 1; k < events; k++)
+				{
+					if (multiEventMasses[j] >= options.XMin && multiEventMasses[j] < options.XMin + options.MassExtent)
+						if (multiEventMasses[k] >= options.YMin && multiEventMasses[k] < options.YMin + options.MassExtent)
+						{
+							int b = (int)((multiEventMasses[j] - options.XMin) / options.Resolution);
+							int a = (int)((multiEventMasses[k] - options.YMin) / options.Resolution);
 
-						int index = a * options.EdgeSize + b;
-						if (index < pixels)
-							Map[index]++;
-					}
+							int index = a * options.EdgeSize + b;
+							if (index < pixels)
+							{
+								Map[index]++;
+								Points.Add(new Vector2(multiEventMasses[k], multiEventMasses[j]));
+							}
+							
+						}
 
-				if (multiEventMasses[k] >= options.XMin && multiEventMasses[k] < options.XMin + options.MassExtent)
-					if (multiEventMasses[j] >= options.YMin && multiEventMasses[j] < options.YMin + options.MassExtent)
-					{
-						int b = (int)((multiEventMasses[j] - options.YMin) / options.Resolution);
-						int a = (int)((multiEventMasses[k] - options.XMin) / options.Resolution);
+					if (multiEventMasses[k] >= options.XMin && multiEventMasses[k] < options.XMin + options.MassExtent)
+						if (multiEventMasses[j] >= options.YMin && multiEventMasses[j] < options.YMin + options.MassExtent)
+						{
+							int b = (int)((multiEventMasses[j] - options.YMin) / options.Resolution);
+							int a = (int)((multiEventMasses[k] - options.XMin) / options.Resolution);
 
-						int index = b * options.EdgeSize + a;
-						if (index < pixels)
-							Map[index]++;
-					}
-			}
+							int index = b * options.EdgeSize + a;
+							if (index < pixels)
+							{
+								Map[index]++;
+								Points.Add(new Vector2(multiEventMasses[j], multiEventMasses[k]));
+							}
+						}
+				}
 
 		}
 
