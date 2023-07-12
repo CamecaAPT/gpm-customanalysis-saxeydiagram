@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
@@ -107,9 +108,18 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			colorMap,
 			new Vector2(Options.XMin, Options.YMin),
 			minValue: CSaxeyDiagram.MinBinValueInclusive);
+		
+
+		ReadOnlyMemory<Vector2> multisData = (ReadOnlyMemory<Vector2>)data[3];
+		var multisRenderData = renderDataFactory.CreateHistogram(multisData, Colors.Black, .5f);
+
+		Vector3[] linePoints = new Vector3[] { new Vector3(0, 0, 0), new Vector3(5, 5, 5) };
+
+		var line = renderDataFactory.CreateLine(linePoints, Colors.Red, 1.5f);
+
 		var saxeyAddonsViewModel = new Histogram2DHistogram1DSideBySideViewModel(
 			"Time Space and Multi Atom Mass Spectrum",
-			sqrtRenderData, sqrtRenderData);
+			sqrtRenderData, multisRenderData, line);
 		Tabs.Add(saxeyAddonsViewModel);
 
 		SelectedTab = histogram2DViewModel;

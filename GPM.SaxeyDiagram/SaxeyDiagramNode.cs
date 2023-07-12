@@ -55,10 +55,14 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 		//var sqrtChart = SaxeyAddons.BuildSqrtChart(saxey.Map, Options.EdgeSize, Options.Resolution, out var newResolution);
 
-		var sqrtChart = SaxeyAddons.BuildSqrtChart(saxey.Points, Options.EdgeSize, Options.Resolution, out var newResolution);
+		var sqrtChart = SaxeyAddons.BuildSqrtChart(saxey.Points, Options.EdgeSize, Options.Resolution, out var newResolution, out var newPhysicalSideLength);
 
 		toRet.Add(sqrtChart);
 		toRet.Add(newResolution);
+
+		var multisChart = SaxeyAddons.BuildMultisHistogram(saxey.Points, newPhysicalSideLength);
+
+		toRet.Add(multisChart);
 
 		if (Options.ExportToCsv)
 		{

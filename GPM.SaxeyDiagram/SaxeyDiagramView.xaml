@@ -64,11 +64,11 @@
                         </Grid.ColumnDefinitions>
                         <controls:Histogram2D DataSource="{Binding Histogram2DRenderData}"
                                           AxisXLabel="sqrt(M/n) (da)"
-                                          AxisYLabel="sqrt(M/n) (da)" 
+                                          AxisYLabel="sqrt(M/n) (da)"
                               Grid.Column ="0"/>
-                        <controls:Histogram2D DataSource="{Binding Histogram1DRenderData}"
-                                          AxisXLabel="PUTLABEL (da)"
-                                          AxisYLabel="PUTLABEL (da)" 
+                        <controls:Chart2D DataSource="{Binding Histogram1DRenderData}"
+                                          AxisXLabel="Delta Time of Flight Squared"
+                                          AxisYLabel="Ions" 
                               Grid.Column ="1"/>
 
                     </Grid>
