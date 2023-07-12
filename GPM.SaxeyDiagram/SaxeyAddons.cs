@@ -44,14 +44,11 @@ public static class SaxeyAddons
 		int end = (int)(maxSqrtMassToCharge * maxSqrtMassToCharge) + 1;
 
 		int boxes = (int)((end - start) / resolution) + 1;
-		Vector2[] histogramData = new Vector2[boxes];
+		int[] histogramData = new int[boxes];
 
 		List<Vector2> histogramList = new();
 
-		int inCount = 0;
-		int outCount = 0;
-
-		SortedDictionary<int, int> map = new SortedDictionary<int, int>();
+		SortedDictionary<int, int> map = new();
 
 		foreach(var point in points)
 		{ 
@@ -60,26 +57,27 @@ public static class SaxeyAddons
 			int index = (int)(deltaTOFSquare / resolution);
 			if (index * resolution <= end && index * resolution >= start)
 			{
-				histogramData[index].X = index * resolution;
-				histogramData[index].Y++;
-				//histogramList.Add(new Vector2(index * resolution, 10));
-				inCount++;
-				if (!map.ContainsKey(index))
-					map.Add(index, 0);
-				map[index]++;
+				histogramData[index]++;
+				//if (!map.ContainsKey(index))
+				//	map.Add(index, 0);
+				//map[index]++;
 			}
-			else
-				outCount++;
 		}
 
-		foreach (var indexCountPair in map)
+		for(int index = 0; index < histogramData.Length; index++)
 		{
-			//if (indexCountPair.Key == 0) continue;
-			histogramList.Add(new Vector2(indexCountPair.Key * resolution, indexCountPair.Value));
+			float box = index * resolution;
+			int count = histogramData[index];
+			histogramList.Add(new Vector2(box, count));
 		}
 
-		//Log10ScaleTransformation(histogramList);
+		//foreach (var indexCountPair in map)
+		//{
+		//	//if (indexCountPair.Key == 0) continue;
+		//	histogramList.Add(new Vector2(indexCountPair.Key * resolution, indexCountPair.Value));
+		//}
 
+		//this needs to be sorted
 		return new ReadOnlyMemory<Vector2>(histogramList.ToArray());
 		//return new ReadOnlyMemory<Vector2>(histogramData);
 	}
