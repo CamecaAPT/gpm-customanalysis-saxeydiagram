@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.HighPerformance;
+﻿using Cameca.CustomAnalysis.Interface;
+using CommunityToolkit.HighPerformance;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -6,6 +7,54 @@ using System.Numerics;
 namespace GPM.CustomAnalysis.SaxeyDiagram;
 public static class SaxeyAddons
 {
+	//Dummy Data
+	private static List<float> DTOFsOfInterest = new() { 20.8f, 9.1f, 5.9f, 2.4f, .3f};
+
+	/*
+	 * CURRENTLY IS HARDCODED DUMMY DATA
+	 */
+	public static List<Vector3[]> GetLines2D(float height)
+	{
+		float h = (float)Math.Sqrt(height);
+
+		List<Vector3[]> lines = new();
+
+		foreach(float val in DTOFsOfInterest)
+		{
+			float sqrtD = (float)Math.Sqrt(val);
+			Vector3 point1 = new Vector3(0, 0, sqrtD);
+			Vector3 point2 = new Vector3(h - sqrtD, 0, h);
+
+			Vector3[] arr = new Vector3[2];
+			arr[0] = point1;
+			arr[1] = point2;
+			lines.Add(arr);
+		}
+
+		return lines;
+	}
+
+	/*
+	 * CURRENTLY IS HARDCODED DUMMY DATA
+	 */
+	public static List<Vector3[]> GetLines1D(int maxHeight)
+	{
+		List<Vector3[]> lines = new();
+
+		foreach(float val in DTOFsOfInterest)
+		{
+			Vector3 point1 = new(val, 0, 0);
+			Vector3 point2 = new(val, 0, maxHeight);
+
+			Vector3[] arr = new Vector3[2];
+			arr[0] = point1;
+			arr[1] = point2;
+			lines.Add(arr);
+		}
+
+		return lines;
+	}
+
 	public static ReadOnlyMemory2D<float> BuildSqrtChart(List<Vector2> points, int origSideLength, float origResolution, out float newResolution, out float newPhysicalSideLength)
 	{
 		float physicalSideLength = origSideLength * origResolution;
@@ -37,7 +86,7 @@ public static class SaxeyAddons
 		return new ReadOnlyMemory2D<float>(histogramArray, newSideLength, newSideLength);
 	}
 
-	public static ReadOnlyMemory<Vector2> BuildMultisHistogram(List<Vector2> points, float maxSqrtMassToCharge, float resolution)
+	public static ReadOnlyMemory<Vector2> BuildMultisHistogram(List<Vector2> points, float maxSqrtMassToCharge, float resolution, out int maxHeight)
 	{
 		int start = 0;
 		int end = (int)(maxSqrtMassToCharge * maxSqrtMassToCharge) + 1;
@@ -60,10 +109,14 @@ public static class SaxeyAddons
 			}
 		}
 
+		maxHeight = 0;
+
 		for(int index = 0; index < histogramData.Length; index++)
 		{
 			float box = index * resolution;
 			int count = histogramData[index];
+			if (count > maxHeight)
+				maxHeight = count;
 			histogramList.Add(new Vector2(box, count));
 		}
 

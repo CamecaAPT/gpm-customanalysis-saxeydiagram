@@ -15,11 +15,17 @@ internal class Histogram2DHistogram1DSideBySideViewModel : IDisposable
 
 	public ObservableCollection<IRenderData> Histogram1DRenderData { get; }
 
-	public Histogram2DHistogram1DSideBySideViewModel(string title, IHistogram2DRenderData content2D, IHistogramRenderData content1D/*, ILineRenderData line*/)
+	public Histogram2DHistogram1DSideBySideViewModel(string title, IHistogram2DRenderData content2D, IHistogramRenderData content1D, List<ILineRenderData> lines2D, List<ILineRenderData> lines1D)
 	{
 		Title = title;
-		Histogram2DRenderData = new ObservableCollection<IRenderData> { content2D /*, line*/ };
+		//Histogram2DRenderData = new ObservableCollection<IRenderData>();
+		Histogram2DRenderData = new ObservableCollection<IRenderData> { content2D };
+		Histogram2DRenderData.AddRange(lines2D);
+		//Histogram2DRenderData.Add(content2D);
+
+
 		Histogram1DRenderData = new ObservableCollection<IRenderData> { content1D };
+		Histogram1DRenderData.AddRange(lines1D);
 	}
 
 	public void Dispose()

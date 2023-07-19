@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -113,13 +114,21 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		ReadOnlyMemory<Vector2> multisData = (ReadOnlyMemory<Vector2>)data[3];
 		var multisRenderData = renderDataFactory.CreateHistogram(multisData, Colors.Black, .5f);
 
-		//Vector3[] linePoints = new Vector3[] { new Vector3(0, 0, 0), new Vector3(5, 5, 5) };
+		List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(Options.MassExtent);
+		List<ILineRenderData> lines2D = new();
+		foreach(var line in line2DPoints)
+			lines2D.Add(renderDataFactory.CreateLine(line, Colors.Yellow, 1.5f));
 
-		//var line = renderDataFactory.CreateLine(linePoints, Colors.Red, 1.5f);
+		int maxHeight = (int)data[4];
+
+		List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(maxHeight);
+		List<ILineRenderData> lines1D = new();
+		foreach (var line in line1DPoints)
+			lines1D.Add(renderDataFactory.CreateLine(line, Colors.Red, 1.5f));
 
 		var saxeyAddonsViewModel = new Histogram2DHistogram1DSideBySideViewModel(
 			"Time Space and Multi Atom Mass Spectrum",
-			sqrtRenderData, multisRenderData);
+			sqrtRenderData, multisRenderData, lines2D, lines1D);
 		Tabs.Add(saxeyAddonsViewModel);
 
 		SelectedTab = histogram2DViewModel;
