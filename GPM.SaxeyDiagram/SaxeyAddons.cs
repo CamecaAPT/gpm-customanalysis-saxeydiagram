@@ -37,9 +37,8 @@ public static class SaxeyAddons
 		return new ReadOnlyMemory2D<float>(histogramArray, newSideLength, newSideLength);
 	}
 
-	public static ReadOnlyMemory<Vector2> BuildMultisHistogram(List<Vector2> points, float maxSqrtMassToCharge)
+	public static ReadOnlyMemory<Vector2> BuildMultisHistogram(List<Vector2> points, float maxSqrtMassToCharge, float resolution)
 	{
-		float resolution = .01f;
 		int start = 0;
 		int end = (int)(maxSqrtMassToCharge * maxSqrtMassToCharge) + 1;
 
@@ -58,9 +57,6 @@ public static class SaxeyAddons
 			if (index * resolution <= end && index * resolution >= start)
 			{
 				histogramData[index]++;
-				//if (!map.ContainsKey(index))
-				//	map.Add(index, 0);
-				//map[index]++;
 			}
 		}
 
@@ -71,15 +67,7 @@ public static class SaxeyAddons
 			histogramList.Add(new Vector2(box, count));
 		}
 
-		//foreach (var indexCountPair in map)
-		//{
-		//	//if (indexCountPair.Key == 0) continue;
-		//	histogramList.Add(new Vector2(indexCountPair.Key * resolution, indexCountPair.Value));
-		//}
-
-		//this needs to be sorted
 		return new ReadOnlyMemory<Vector2>(histogramList.ToArray());
-		//return new ReadOnlyMemory<Vector2>(histogramData);
 	}
 
 	private static void NormalizeMap(float[] histogramArray)

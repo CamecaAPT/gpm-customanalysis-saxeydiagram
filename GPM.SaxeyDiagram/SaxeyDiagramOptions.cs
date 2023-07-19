@@ -81,4 +81,12 @@ public class SaxeyDiagramOptions : BindableBase
 		get => mirrorPlot;
 		set => SetProperty(ref mirrorPlot, value);
 	}
+
+	private float dtofBinSize = .01f;
+	[Display(Name = "DToF Mass Spec Bin Size", Description = "Bin size for the calculated mass spectrum (Delta Time of Flight Squared)")]
+	public float DToFBinSize
+	{
+		get => dtofBinSize;
+		set => SetProperty(ref dtofBinSize, value);
+	}
 }

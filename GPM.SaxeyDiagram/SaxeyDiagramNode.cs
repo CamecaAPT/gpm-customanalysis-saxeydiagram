@@ -60,7 +60,7 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 		toRet.Add(sqrtChart);
 		toRet.Add(newResolution);
 
-		var multisChart = SaxeyAddons.BuildMultisHistogram(saxey.Points, newPhysicalSideLength);
+		var multisChart = SaxeyAddons.BuildMultisHistogram(saxey.Points, newPhysicalSideLength, Options.DToFBinSize);
 
 		toRet.Add(multisChart);
 
