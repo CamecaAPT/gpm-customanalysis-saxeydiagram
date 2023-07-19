@@ -40,9 +40,6 @@ internal class CSaxeyDiagram
 		NormalizeMap(Map);
 
 		ReplaceLowerValues(MinBinValueInclusive, ReplacedOutOfRangeBinValue);
-
-		if (!options.MirrorPlot)
-			RemoveBottomHalf();
 	}
 
 	private void BuildFromMultiplicitySection(IIonData ionData)
@@ -173,19 +170,6 @@ internal class CSaxeyDiagram
 		}
 	}
 
-	private void RemoveBottomHalf()
-	{
-		for(int i=0; i<options.EdgeSize; i++)
-		{
-			for(int j=0; j<options.EdgeSize; j++)
-			{
-				int index = i*options.EdgeSize + j;
-				if (j < i)
-					Map[index] = 0.0f;
-			}
-		}
-	}
-
 	private void ProcessEvent(List<float> multiEventMasses)
 	{
 		// We have the whole event, sort and plot.
@@ -198,21 +182,23 @@ internal class CSaxeyDiagram
 			for (int j = 0; j < events - 1; j++)
 				for (int k = j + 1; k < events; k++)
 				{
-					if (multiEventMasses[j] >= options.XMin && multiEventMasses[j] < options.XMin + options.MassExtent)
-						if (multiEventMasses[k] >= options.YMin && multiEventMasses[k] < options.YMin + options.MassExtent)
-						{
-							int b = (int)((multiEventMasses[j] - options.XMin) / options.Resolution);
-							int a = (int)((multiEventMasses[k] - options.YMin) / options.Resolution);
-
-							int index = a * options.EdgeSize + b;
-							if (index < pixels)
+					if(options.MirrorPlot)
+					{
+						if (multiEventMasses[j] >= options.XMin && multiEventMasses[j] < options.XMin + options.MassExtent)
+							if (multiEventMasses[k] >= options.YMin && multiEventMasses[k] < options.YMin + options.MassExtent)
 							{
-								Map[index]++;
-								Points.Add(new Vector2(multiEventMasses[k], multiEventMasses[j]));
-							}
-							
-						}
+								int b = (int)((multiEventMasses[j] - options.XMin) / options.Resolution);
+								int a = (int)((multiEventMasses[k] - options.YMin) / options.Resolution);
 
+								int index = a * options.EdgeSize + b;
+								if (index < pixels)
+								{
+									Map[index]++;
+									Points.Add(new Vector2(multiEventMasses[k], multiEventMasses[j]));
+								}
+
+							}
+					}
 					if (multiEventMasses[k] >= options.XMin && multiEventMasses[k] < options.XMin + options.MassExtent)
 						if (multiEventMasses[j] >= options.YMin && multiEventMasses[j] < options.YMin + options.MassExtent)
 						{
