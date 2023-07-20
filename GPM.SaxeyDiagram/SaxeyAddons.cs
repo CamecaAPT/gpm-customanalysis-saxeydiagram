@@ -22,8 +22,8 @@ public static class SaxeyAddons
 		foreach(float val in DTOFsOfInterest)
 		{
 			float sqrtD = (float)Math.Sqrt(val);
-			Vector3 point1 = new Vector3(0, 0, sqrtD);
-			Vector3 point2 = new Vector3(h - sqrtD, 0, h);
+			Vector3 point1 = new Vector3(0, -1, sqrtD);
+			Vector3 point2 = new Vector3(h - sqrtD, -1, h);
 
 			Vector3[] arr = new Vector3[2];
 			arr[0] = point1;
@@ -43,8 +43,8 @@ public static class SaxeyAddons
 
 		foreach(float val in DTOFsOfInterest)
 		{
-			Vector3 point1 = new(val, 0, 0);
-			Vector3 point2 = new(val, 0, maxHeight);
+			Vector3 point1 = new(val, -1, 0);
+			Vector3 point2 = new(val, -1, maxHeight);
 
 			Vector3[] arr = new Vector3[2];
 			arr[0] = point1;

@@ -117,14 +117,14 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(Options.MassExtent);
 		List<ILineRenderData> lines2D = new();
 		foreach(var line in line2DPoints)
-			lines2D.Add(renderDataFactory.CreateLine(line, Colors.Yellow, 1.5f));
+			lines2D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
 
 		int maxHeight = (int)data[4];
 
 		List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(maxHeight);
 		List<ILineRenderData> lines1D = new();
 		foreach (var line in line1DPoints)
-			lines1D.Add(renderDataFactory.CreateLine(line, Colors.Red, 1.5f));
+			lines1D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
 
 		var saxeyAddonsViewModel = new Histogram2DHistogram1DSideBySideViewModel(
 			"Time Space and Multi Atom Mass Spectrum",
