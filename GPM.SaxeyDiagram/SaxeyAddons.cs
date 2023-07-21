@@ -10,10 +10,17 @@ public static class SaxeyAddons
 	//Dummy Data
 	private static List<float> DTOFsOfInterest = new() { 20.8f, 9.1f, 5.9f, 2.4f, .3f};
 
+	private static List<(float, float)> massToChargePairs = new() { (14, 69), (28, 69), (34.5f, 69), (14, 28), (28, 34.5f) };
+
 	/*
 	 * CURRENTLY IS HARDCODED DUMMY DATA
 	 */
 	public static List<Vector3[]> GetLinesSaxey(float maxHeight)
+	{
+		return GetLinesSaxey(massToChargePairs, maxHeight);
+	}
+
+	public static List<Vector3[]> GetLinesSaxey(List<(float, float)> massToChargePairs, float maxHeight)
 	{
 		List<Vector3[]> lines = new();
 
@@ -22,17 +29,17 @@ public static class SaxeyAddons
 		//this is essentially the resolution of the line
 		const float deltaX = .1f;
 		
-		
-		foreach(var dtof in DTOFsOfInterest)
+		foreach(var massToChargePair in massToChargePairs)
 		{
 			List<Vector3> line = new();
 			float xVal = 0f;
 			float yVal = 0f;
+			var dtof = Math.Abs(Math.Sqrt(massToChargePair.Item1) - Math.Sqrt(massToChargePair.Item2));
 			do
 			{
 				line.Add(new Vector3(xVal, -1, yVal));
 				xVal += deltaX;
-				yVal = (float)Math.Pow(Math.Sqrt(xVal) + Math.Sqrt(dtof),2);
+				yVal = (float)Math.Pow(Math.Sqrt(xVal) + dtof, 2);
 			} while (yVal <= maxHeight && xVal <= maxHeight);
 			lines.Add(line.ToArray());
 		}
@@ -43,17 +50,22 @@ public static class SaxeyAddons
 	/*
 	 * CURRENTLY IS HARDCODED DUMMY DATA
 	 */
-	public static List<Vector3[]> GetLines2D(float height)
+	public static List<Vector3[]> GetLines2D(float maxHeight)
+	{
+		return GetLines2D(massToChargePairs, maxHeight);
+	}
+
+	public static List<Vector3[]> GetLines2D(List<(float, float)> massToChargePairs, float height)
 	{
 		float h = (float)Math.Sqrt(height);
 
 		List<Vector3[]> lines = new();
 
-		foreach(float val in DTOFsOfInterest)
+		foreach(var massToChargePair in massToChargePairs)
 		{
-			float sqrtD = (float)Math.Sqrt(val);
-			Vector3 point1 = new Vector3(0, -1, sqrtD);
-			Vector3 point2 = new Vector3(h - sqrtD, -1, h);
+			float dtof = (float)Math.Abs(Math.Sqrt(massToChargePair.Item1) - Math.Sqrt(massToChargePair.Item2));
+			Vector3 point1 = new Vector3(0, -1, dtof);
+			Vector3 point2 = new Vector3(h - dtof, -1, h);
 
 			Vector3[] arr = new Vector3[2];
 			arr[0] = point1;
@@ -69,12 +81,19 @@ public static class SaxeyAddons
 	 */
 	public static List<Vector3[]> GetLines1D(int maxHeight)
 	{
+		return GetLines1D(massToChargePairs, maxHeight);
+	}
+
+	public static List<Vector3[]> GetLines1D(List<(float, float)> massToChargePairs, int maxHeight)
+	{
 		List<Vector3[]> lines = new();
 
-		foreach(float val in DTOFsOfInterest)
+		foreach(var massToChargePair in massToChargePairs)
 		{
-			Vector3 point1 = new(val, -1, 0);
-			Vector3 point2 = new(val, -1, maxHeight);
+			float dtof = (float)Math.Abs(Math.Sqrt(massToChargePair.Item1) - Math.Sqrt(massToChargePair.Item2));
+			var dtofSquared = dtof * dtof;
+			Vector3 point1 = new(dtofSquared, -1, 0);
+			Vector3 point2 = new(dtofSquared, -1, maxHeight);
 
 			Vector3[] arr = new Vector3[2];
 			arr[0] = point1;
