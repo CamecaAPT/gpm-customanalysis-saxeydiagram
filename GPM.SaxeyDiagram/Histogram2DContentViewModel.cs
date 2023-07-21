@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Cameca.CustomAnalysis.Interface;
 
@@ -10,10 +11,11 @@ internal class Histogram2DContentViewModel : IDisposable
 
 	public ObservableCollection<IRenderData> Histogram2DRenderData { get; }
 
-	public Histogram2DContentViewModel(string title, IHistogram2DRenderData content)
+	public Histogram2DContentViewModel(string title, IHistogram2DRenderData content, List<ILineRenderData> lines)
 	{
 		Title = title;
 		Histogram2DRenderData = new ObservableCollection<IRenderData> { content };
+		Histogram2DRenderData.AddRange(lines);
 	}
 
 	public void Dispose()

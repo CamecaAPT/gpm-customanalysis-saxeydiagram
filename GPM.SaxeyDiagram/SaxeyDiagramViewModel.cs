@@ -89,8 +89,16 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		}
 
 		ReadOnlyMemory2D<float> saxeyData = (ReadOnlyMemory2D<float>)data[0];
-		
-		var renderData = renderDataFactory.CreateHistogram2D(
+
+		List<ILineRenderData> saxeyLines = new();
+		if (Options.LineSelections.SaxeyDiagram)
+		{
+			List<Vector3[]> lineSaxeyPoints = SaxeyAddons.GetLinesSaxey(Options.MassExtent);
+			foreach (var line in lineSaxeyPoints)
+				saxeyLines.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
+		}
+
+			var renderData = renderDataFactory.CreateHistogram2D(
 			saxeyData,
 			new Vector2(Options.Resolution, Options.Resolution),
 			colorMap,
@@ -98,7 +106,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			minValue: CSaxeyDiagram.MinBinValueInclusive);
 		var histogram2DViewModel = new Histogram2DContentViewModel(
 			"Saxey Diagram",
-			renderData);
+			renderData, saxeyLines);
 		Tabs.Add(histogram2DViewModel);
 
 		ReadOnlyMemory2D<float> sqrtData = (ReadOnlyMemory2D<float>)data[1];
@@ -114,17 +122,25 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		ReadOnlyMemory<Vector2> multisData = (ReadOnlyMemory<Vector2>)data[3];
 		var multisRenderData = renderDataFactory.CreateHistogram(multisData, Colors.Black, .5f);
 
-		List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(Options.MassExtent);
 		List<ILineRenderData> lines2D = new();
-		foreach(var line in line2DPoints)
-			lines2D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
+		if (Options.LineSelections.LinearizedDiagram)
+		{
+			List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(Options.MassExtent);
+			foreach (var line in line2DPoints)
+				lines2D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
+		}
 
-		int maxHeight = (int)data[4];
-
-		List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(maxHeight);
 		List<ILineRenderData> lines1D = new();
-		foreach (var line in line1DPoints)
-			lines1D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
+		if (Options.LineSelections.CalculatedMassSpectrum)
+		{
+			int maxHeight = (int)data[4];
+
+			List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(maxHeight);
+			foreach (var line in line1DPoints)
+				lines1D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
+		}
+
+		
 
 		var saxeyAddonsViewModel = new Histogram2DHistogram1DSideBySideViewModel(
 			"Time Space and Multi Atom Mass Spectrum",

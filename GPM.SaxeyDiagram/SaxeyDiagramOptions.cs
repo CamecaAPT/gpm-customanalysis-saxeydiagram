@@ -89,4 +89,7 @@ public class SaxeyDiagramOptions : BindableBase
 		get => dtofBinSize;
 		set => SetProperty(ref dtofBinSize, value);
 	}
+
+	[Display(Name = "Where to show lines", Description = "Which graphs to render lines onto.")]
+	public LineSelections LineSelections { get; set; } = new LineSelections();
 }

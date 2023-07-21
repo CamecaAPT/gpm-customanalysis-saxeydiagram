@@ -13,6 +13,36 @@ public static class SaxeyAddons
 	/*
 	 * CURRENTLY IS HARDCODED DUMMY DATA
 	 */
+	public static List<Vector3[]> GetLinesSaxey(float maxHeight)
+	{
+		List<Vector3[]> lines = new();
+
+		//y = ( sqrt(x) + (m2/c2 - m1/c1) )^2
+
+		//this is essentially the resolution of the line
+		const float deltaX = .1f;
+		
+		
+		foreach(var dtof in DTOFsOfInterest)
+		{
+			List<Vector3> line = new();
+			float xVal = 0f;
+			float yVal = 0f;
+			do
+			{
+				line.Add(new Vector3(xVal, -1, yVal));
+				xVal += deltaX;
+				yVal = (float)Math.Pow(Math.Sqrt(xVal) + Math.Sqrt(dtof),2);
+			} while (yVal <= maxHeight && xVal <= maxHeight);
+			lines.Add(line.ToArray());
+		}
+
+		return lines;
+	}
+
+	/*
+	 * CURRENTLY IS HARDCODED DUMMY DATA
+	 */
 	public static List<Vector3[]> GetLines2D(float height)
 	{
 		float h = (float)Math.Sqrt(height);
