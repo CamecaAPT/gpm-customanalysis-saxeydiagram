@@ -37,9 +37,9 @@ public static class SaxeyAddons
 			var dtof = Math.Abs(Math.Sqrt(massToChargePair.Item1) - Math.Sqrt(massToChargePair.Item2));
 			do
 			{
+				yVal = (float)Math.Pow(Math.Sqrt(xVal) + dtof, 2);
 				line.Add(new Vector3(xVal, -1, yVal));
 				xVal += deltaX;
-				yVal = (float)Math.Pow(Math.Sqrt(xVal) + dtof, 2);
 			} while (yVal <= maxHeight && xVal <= maxHeight);
 			lines.Add(line.ToArray());
 		}
