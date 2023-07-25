@@ -79,7 +79,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 	private void OnAddLine()
 	{
-		if (!massToChargePairs.Contains((Options.Atom1mc, Options.Atom2mc)))
+		if (!(massToChargePairs.Contains((Options.Atom1mc, Options.Atom2mc)) || massToChargePairs.Contains((Options.Atom2mc, Options.Atom1mc))))
 			massToChargePairs.Add((Options.Atom1mc, Options.Atom2mc));
 		else
 			MessageBox.Show("Atom Pair Already Added");
