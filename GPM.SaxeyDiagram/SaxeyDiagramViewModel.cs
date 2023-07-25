@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Cameca.CustomAnalysis.Interface;
@@ -26,6 +27,15 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	private readonly AsyncRelayCommand runCommand;
 	public ICommand RunCommand => runCommand;
 
+	private readonly RelayCommand addLine;
+	public ICommand AddLineCommand => addLine;
+
+	private readonly RelayCommand removeLines;
+	public ICommand RemoveLinesCommand => removeLines;
+
+	private ObservableCollection<(float, float)> massToChargePairs;
+	public ObservableCollection<(float, float)> MassToChargePairs => massToChargePairs;
+
 	public SaxeyDiagramOptions Options => Node?.Options ?? new ();
 
 	public ObservableCollection<object> Tabs { get; } = new();
@@ -45,6 +55,9 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		this.renderDataFactory = renderDataFactory;
 		runCommand = new AsyncRelayCommand(OnRun, UpdateSelectedEventCountsEnabled);
 		colorMap = CreateBrightColorMap(colorMapFactory);
+		addLine = new RelayCommand(OnAddLine);
+		removeLines = new RelayCommand(OnRemoveLines);
+		massToChargePairs = new();
 	}
 
 	protected override void OnCreated(ViewModelCreatedEventArgs eventArgs)
@@ -62,6 +75,21 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		base.OnActivated(eventArgs);
 		if (!Tabs.Any())
 			RunCommand.Execute(null);
+	}
+
+	private void OnAddLine()
+	{
+		if (!massToChargePairs.Contains((Options.Atom1mc, Options.Atom2mc)))
+			massToChargePairs.Add((Options.Atom1mc, Options.Atom2mc));
+		else
+			MessageBox.Show("Atom Pair Already Added");
+		runCommand.Execute(null);
+	}
+
+	private void OnRemoveLines()
+	{
+		massToChargePairs.Clear();
+		runCommand.Execute(null);
 	}
 
 	private async Task OnRun()
@@ -93,7 +121,8 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		List<ILineRenderData> saxeyLines = new();
 		if (Options.LineSelections.SaxeyDiagram)
 		{
-			List<Vector3[]> lineSaxeyPoints = SaxeyAddons.GetLinesSaxey(Options.MassExtent);
+			//List<Vector3[]> lineSaxeyPoints = SaxeyAddons.GetLinesSaxey(Options.MassExtent);
+			List<Vector3[]> lineSaxeyPoints = SaxeyAddons.GetLinesSaxey(massToChargePairs.ToList(), Options.MassExtent);
 			foreach (var line in lineSaxeyPoints)
 				saxeyLines.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
 		}
@@ -125,7 +154,8 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		List<ILineRenderData> lines2D = new();
 		if (Options.LineSelections.LinearizedDiagram)
 		{
-			List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(Options.MassExtent);
+			//List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(Options.MassExtent);
+			List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(massToChargePairs.ToList(), Options.MassExtent);
 			foreach (var line in line2DPoints)
 				lines2D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
 		}
@@ -135,7 +165,8 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		{
 			int maxHeight = (int)data[4];
 
-			List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(maxHeight);
+			//List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(maxHeight);
+			List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(massToChargePairs.ToList(), maxHeight);
 			foreach (var line in line1DPoints)
 				lines1D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
 		}

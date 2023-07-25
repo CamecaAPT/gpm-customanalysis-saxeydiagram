@@ -24,7 +24,10 @@
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Button Grid.Row="0"
@@ -38,6 +41,9 @@
                                    ShowSearchBox="False"
                                    ExpandButtonsVisibility="Visible"
                                    ExpandCategoriesWhenSelectedObjectChanged="True" />
+            <Button Content="Add Line" Grid.Row="2" Command="{Binding AddLineCommand}" />
+            <Button Content="Remove Lines" Grid.Row="3" Command="{Binding RemoveLinesCommand}"/>
+            <ListBox Grid.Row="4" ItemsSource="{Binding MassToChargePairs}" />
         </Grid>
 
         <GridSplitter Grid.Column="1"
