@@ -1,11 +1,62 @@
 ﻿using CommunityToolkit.HighPerformance;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Numerics;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
 public static class SaxeyAddons
 {
+	private static List<string> massToChargeXIons = new() { "Ga+++(1)", "Ga+++(2)", "N2+", "NH2+", "Ga++(1)", "Ga++(2)", "GaN++(1)", "GaN++(2)", "N3+", "Ga+(1)", "Ga+(2)" }; 
+	private static List<float> massToChargeX = new() { 23, 23.7f, 28, 29, 34.5f, 35.5f, 41.5f, 42.5f, 42, 69, 71 };
+
+	private static List<string> massToChargeYIons = new() { "H+", "H2+", "N++", "N+", "Ga+++(1)", "Ga+++(2)", "N2+", "NH2+", "NH2+", "Ga++(1)", "Ga++(2)", "GaN3++(1)", "GaN3++(2)", "Ga+(1)", "Ga+(2)" };
+	private static List<float> massToChargeY = new() { 1, 2, 7, 14, 23, 23.7f, 28, 29, 34.5f, 35.5f, 55.5f, 56.5f, 69, 71 };
+
+	/*
+	 * Dummy Data Method
+	 */
+	public static DataTable BuildRangeTable()
+	{
+		return BuildRangeTable(massToChargeX, massToChargeY);
+	}
+
+	public static DataTable BuildRangeTable(List<float> massToChargeX, List<float> massToChargeY)
+	{
+		DataTable rangeTable = new();
+
+		//Add Columns
+		rangeTable.Columns.Add("_");
+		rangeTable.Columns.Add("__");
+		foreach (var xLabel in massToChargeXIons)
+			rangeTable.Columns.Add(xLabel);
+
+		//List<object> cols = new();
+		//cols.Add("");
+		//foreach (var mass in massToChargeX)
+		//{
+		//	cols.Add(mass.ToString("f2"));
+		//}
+		//rangeTable.Rows.Add(cols.ToArray());
+
+		for(int i=0; i<massToChargeY.Count; i++)
+		{
+			var massY = massToChargeY[i];
+			List<object> row = new();
+			row.Add(massToChargeYIons[i]);
+			row.Add(massY.ToString("f2"));
+			foreach(var massX in massToChargeX)
+			{
+				var dtofSquared = Math.Pow(Math.Sqrt(massX) - Math.Sqrt(massY), 2);
+				row.Add(dtofSquared.ToString("f2"));
+			}
+			rangeTable.Rows.Add(row.ToArray());
+		}
+
+
+		return rangeTable;
+	}
+
 	public static ReadOnlyMemory2D<float> BuildSqrtChart(List<Vector2> points, int origSideLength, float origResolution, out float newResolution, out float newPhysicalSideLength)
 	{
 		float physicalSideLength = origSideLength * origResolution;

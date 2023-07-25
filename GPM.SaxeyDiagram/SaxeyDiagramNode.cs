@@ -64,6 +64,9 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 		toRet.Add(multisChart);
 
+		var rangeTable = SaxeyAddons.BuildRangeTable();
+		toRet.Add(rangeTable);
+
 		if (Options.ExportToCsv)
 		{
 			var csvName = ionData.Filename + ".SP.csv";

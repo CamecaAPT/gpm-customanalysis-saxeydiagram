@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -121,6 +122,10 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			"Time Space and Multi Atom Mass Spectrum",
 			sqrtRenderData, multisRenderData);
 		Tabs.Add(saxeyAddonsViewModel);
+
+		DataTable rangeTable = (DataTable)data[4];
+		var rangeTableViewModel = new RangeTableViewModel("Range Table", rangeTable);
+		Tabs.Add(rangeTableViewModel);
 
 		SelectedTab = histogram2DViewModel;
 	}
