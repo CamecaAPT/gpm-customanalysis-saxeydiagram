@@ -28,6 +28,8 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Button Grid.Row="0"
@@ -41,9 +43,11 @@
                                    ShowSearchBox="False"
                                    ExpandButtonsVisibility="Visible"
                                    ExpandCategoriesWhenSelectedObjectChanged="True" />
-            <Button Content="Add Line" Grid.Row="2" Command="{Binding AddLineCommand}" />
-            <Button Content="Remove Lines" Grid.Row="3" Command="{Binding RemoveLinesCommand}"/>
-            <ListBox Grid.Row="4" ItemsSource="{Binding MassToChargePairs}" />
+            <Button Content="Add Ion" Grid.Row="2" Command="{Binding AddLineCommand}" />
+            <Label Grid.Row="3" Content="Ion Name (e.g.H+ or Ga++)"/>
+            <TextBox Grid.Row="4" Text="{Binding IonName.Value}"/>
+            <Button Content="Remove Ions" Grid.Row="5" Command="{Binding RemoveLinesCommand}"/>
+            <ListBox Grid.Row="6" ItemsSource="{Binding SelectedIons}"/>
         </Grid>
 
         <GridSplitter Grid.Column="1"
