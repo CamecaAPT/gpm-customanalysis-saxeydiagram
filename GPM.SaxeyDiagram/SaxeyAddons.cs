@@ -31,14 +31,6 @@ public static class SaxeyAddons
 		foreach (var xLabel in massToChargeXIons)
 			rangeTable.Columns.Add(xLabel);
 
-		//List<object> cols = new();
-		//cols.Add("");
-		//foreach (var mass in massToChargeX)
-		//{
-		//	cols.Add(mass.ToString("f2"));
-		//}
-		//rangeTable.Rows.Add(cols.ToArray());
-
 		for(int i=0; i<massToChargeY.Count; i++)
 		{
 			var massY = massToChargeY[i];
