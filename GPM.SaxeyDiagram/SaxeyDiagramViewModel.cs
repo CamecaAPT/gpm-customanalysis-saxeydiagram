@@ -41,6 +41,11 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 	public ObservableObject<string> IonName { get; set; } = new();
 
+	public string ListBoxSelection { get; set; } = "";
+
+	private readonly RelayCommand listViewDoubleClick;
+	public ICommand ListViewDoubleClick => listViewDoubleClick;
+
 	public SaxeyDiagramOptions Options => Node?.Options ?? new ();
 
 	public ObservableCollection<object> Tabs { get; } = new();
@@ -63,6 +68,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		addLine = new RelayCommand(OnAddLine);
 		removeLines = new RelayCommand(OnRemoveLines);
 		//massToChargePairs = new();
+		listViewDoubleClick = new RelayCommand(OnListViewDoubleClick);
 	}
 
 	protected override void OnCreated(ViewModelCreatedEventArgs eventArgs)
@@ -88,6 +94,15 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		{
 			SelectedIons.Add(IonName.Value);
 			IonName.Value = "";
+			runCommand.Execute(null);
+		}
+	}
+
+	public void OnListViewDoubleClick()
+	{
+		if(SelectedIons.Contains(ListBoxSelection))
+		{
+			SelectedIons.Remove(ListBoxSelection);
 			runCommand.Execute(null);
 		}
 	}
