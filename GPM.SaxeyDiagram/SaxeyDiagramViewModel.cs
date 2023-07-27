@@ -207,7 +207,10 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 		DataTable rangeTable = (DataTable)data[5];
 		var rangeTableViewModel = new RangeTableViewModel("Range Table", rangeTable);
-		Tabs.Add(rangeTableViewModel);
+		if (rangeTable.Rows.Count > 0)
+			Tabs.Add(rangeTableViewModel);
+		else
+			Tabs.Add(new TextContentViewModel("Range Table", "Select at least one ion for the range table to be populated"));
 
 		SelectedTab = histogram2DViewModel;
 	}

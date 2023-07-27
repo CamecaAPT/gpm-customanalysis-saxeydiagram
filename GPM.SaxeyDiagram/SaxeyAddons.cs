@@ -32,6 +32,8 @@ public static class SaxeyAddons
 	{
 		DataTable rangeTable = new();
 
+		if (ions.Count == 0) return rangeTable;
+
 		//Add Columns
 		rangeTable.Columns.Add("_");
 		rangeTable.Columns.Add("__");
