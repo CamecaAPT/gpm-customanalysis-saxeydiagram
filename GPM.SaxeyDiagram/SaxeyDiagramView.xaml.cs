@@ -10,4 +10,10 @@ public partial class SaxeyDiagramView : UserControl
 	{
 		InitializeComponent();
 	}
+
+	private void ListBox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+	{
+		var dataContext = (SaxeyDiagramViewModel)DataContext;
+		dataContext.OnListViewDoubleClick();
+    }
 }

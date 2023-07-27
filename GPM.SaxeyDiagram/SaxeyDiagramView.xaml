@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:Cameca.Extensions.Controls;assembly=Cameca.Extensions.Controls"
              xmlns:local="clr-namespace:GPM.CustomAnalysis.SaxeyDiagram"
              mc:Ignorable="d"
@@ -48,12 +47,7 @@
             <Label Grid.Row="3" Content="Ion Name (e.g.H+ or Ga++)"/>
             <TextBox Grid.Row="4" Text="{Binding IonName.Value}"/>
             <Button Content="Remove Ions" Grid.Row="5" Command="{Binding RemoveLinesCommand}"/>
-            <ListBox Grid.Row="6" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}">
-                <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="MouseDoubleClick">
-                        <b:InvokeCommandAction Command="{Binding ListViewDoubleClick}"/>
-                    </b:EventTrigger>
-                </b:Interaction.Triggers>
+            <ListBox Grid.Row="6" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}" MouseDoubleClick="ListBox_MouseDoubleClick">
             </ListBox>
         </Grid>
 
