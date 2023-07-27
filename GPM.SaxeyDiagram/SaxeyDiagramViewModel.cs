@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml.Linq;
 using Cameca.CustomAnalysis.Interface;
 using Cameca.CustomAnalysis.Utilities;
 using CommunityToolkit.HighPerformance;
@@ -125,6 +127,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		// This shouldn't happen but check for safety
         if (Node is null) return;
 
+		Node.IonLineAndChartSelection = SelectedIons.ToList();
 		var data = await Node.Run();
 
 		if (data == null)
@@ -201,6 +204,10 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			"Time Space and Multi Atom Mass Spectrum",
 			sqrtRenderData, multisRenderData, lines2D, lines1D);
 		Tabs.Add(saxeyAddonsViewModel);
+
+		DataTable rangeTable = (DataTable)data[5];
+		var rangeTableViewModel = new RangeTableViewModel("Range Table", rangeTable);
+		Tabs.Add(rangeTableViewModel);
 
 		SelectedTab = histogram2DViewModel;
 	}

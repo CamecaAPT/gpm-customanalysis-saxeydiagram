@@ -2,6 +2,7 @@
 using CommunityToolkit.HighPerformance;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Numerics;
 using System.Windows;
@@ -10,6 +11,88 @@ using System.Windows.Media.Media3D;
 namespace GPM.CustomAnalysis.SaxeyDiagram;
 public static class SaxeyAddons
 {
+	private static List<string> massToChargeXIons = new() { "Ga+++(1)", "Ga+++(2)", "N2+", "NH2+", "Ga++(1)", "Ga++(2)", "GaN++(1)", "GaN++(2)", "N3+", "Ga+(1)", "Ga+(2)" }; 
+	private static List<float> massToChargeX = new() { 23, 23.7f, 28, 29, 34.5f, 35.5f, 41.5f, 42.5f, 42, 69, 71 };
+
+	private static List<string> massToChargeYIons = new() { "H+", "H2+", "N++", "N+", "Ga+++(1)", "Ga+++(2)", "N2+", "NH2+", "NH2+", "Ga++(1)", "Ga++(2)", "GaN3++(1)", "GaN3++(2)", "Ga+(1)", "Ga+(2)" };
+	private static List<float> massToChargeY = new() { 1, 2, 7, 14, 23, 23.7f, 28, 29, 34.5f, 35.5f, 55.5f, 56.5f, 69, 71 };
+
+
+	/*
+	 * Dummy Data Method
+	 */
+	public static DataTable BuildRangeTable(List<string> selectedIons)
+	{
+		return BuildRangeTable(selectedIons, symbolToMassDict);
+		//return BuildRangeTable(massToChargeX, massToChargeY);
+		//return BuildRangeTable(rangeChartIons);
+	}
+
+	public static DataTable BuildRangeTable(List<string> ions, Dictionary<string, float> symbolToMassDict)
+	{
+		DataTable rangeTable = new();
+
+		//Add Columns
+		rangeTable.Columns.Add("_");
+		rangeTable.Columns.Add("__");
+		foreach(var ion in ions)
+			rangeTable.Columns.Add(ion);
+
+		//add secondary column information (ion weight)
+		List<object> row = new() { "", "" };
+		foreach (var ion in ions)
+			row.Add(symbolToMassDict[ion].ToString("f2"));
+		rangeTable.Rows.Add(row.ToArray());
+
+		for(int i=0; i<ions.Count; i++)
+		{
+			var ion1Symbol = ions[i];
+			row = new() { ion1Symbol, symbolToMassDict[ion1Symbol].ToString("f2") };
+
+			//add spaces
+			for (int k = 0; k < i; k++)
+				row.Add("");
+
+			for(int j=i; j<ions.Count; j++)
+			{
+				var ion2Symbol = ions[j];
+				var dtofSquared = Math.Pow(Math.Sqrt(symbolToMassDict[ion1Symbol]) - Math.Sqrt(symbolToMassDict[ion2Symbol]), 2);
+				row.Add(dtofSquared.ToString("f2"));
+			}
+			rangeTable.Rows.Add(row.ToArray());
+		}
+
+		return rangeTable;
+	}
+
+	public static DataTable BuildRangeTable(List<float> massToChargeX, List<float> massToChargeY)
+	{
+		DataTable rangeTable = new();
+
+		//Add Columns
+		rangeTable.Columns.Add("_");
+		rangeTable.Columns.Add("__");
+		foreach (var xLabel in massToChargeXIons)
+			rangeTable.Columns.Add(xLabel);
+
+		for (int i = 0; i < massToChargeY.Count; i++)
+		{
+			var massY = massToChargeY[i];
+			List<object> row = new();
+			row.Add(massToChargeYIons[i]);
+			row.Add(massY.ToString("f2"));
+			foreach (var massX in massToChargeX)
+			{
+				var dtofSquared = Math.Pow(Math.Sqrt(massX) - Math.Sqrt(massY), 2);
+				row.Add(dtofSquared.ToString("f2"));
+			}
+			rangeTable.Rows.Add(row.ToArray());
+		}
+
+
+		return rangeTable;
+	}
+
 	//Dummy Data
 	private static List<float> DTOFsOfInterest = new() { 20.8f, 9.1f, 5.9f, 2.4f, .3f};
 

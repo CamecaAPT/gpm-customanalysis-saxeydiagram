@@ -30,6 +30,8 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 	public SaxeyDiagramOptions Options { get; private set; } = new();
 
+	public List<string> IonLineAndChartSelection { get; set; } = new();
+
 	public async Task<List<object>?> Run()
 	{
 		List<object> toRet = new();
@@ -64,6 +66,9 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 		toRet.Add(multisChart);
 		toRet.Add(maxHeight);
+
+		var rangeTable = SaxeyAddons.BuildRangeTable(IonLineAndChartSelection);
+		toRet.Add(rangeTable);
 
 		if (Options.ExportToCsv)
 		{
