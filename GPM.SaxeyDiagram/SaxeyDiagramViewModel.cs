@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml.Linq;
 using Cameca.CustomAnalysis.Interface;
 using Cameca.CustomAnalysis.Utilities;
 using CommunityToolkit.HighPerformance;
@@ -126,6 +127,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		// This shouldn't happen but check for safety
         if (Node is null) return;
 
+		Node.IonLineAndChartSelection = SelectedIons.ToList();
 		var data = await Node.Run();
 
 		if (data == null)

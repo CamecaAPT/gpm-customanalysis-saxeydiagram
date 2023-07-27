@@ -17,36 +17,18 @@ public static class SaxeyAddons
 	private static List<string> massToChargeYIons = new() { "H+", "H2+", "N++", "N+", "Ga+++(1)", "Ga+++(2)", "N2+", "NH2+", "NH2+", "Ga++(1)", "Ga++(2)", "GaN3++(1)", "GaN3++(2)", "Ga+(1)", "Ga+(2)" };
 	private static List<float> massToChargeY = new() { 1, 2, 7, 14, 23, 23.7f, 28, 29, 34.5f, 35.5f, 55.5f, 56.5f, 69, 71 };
 
-	public class Ion
-	{
-		public string Symbol { get; set; }
-		public float Mass { get; set; }
-
-		public Ion(string symbol, float mass)
-		{
-			Symbol = symbol;
-			Mass = mass;
-		}
-	}
-
-	private static List<Ion> rangeChartIons = new()
-	{
-		new Ion("N+", 14),
-		new Ion("Ga+", 69),
-		new Ion("N2+", 28),
-		new Ion("Ga++", 34.5f)
-	};
 
 	/*
 	 * Dummy Data Method
 	 */
-	public static DataTable BuildRangeTable()
+	public static DataTable BuildRangeTable(List<string> selectedIons)
 	{
+		return BuildRangeTable(selectedIons, symbolToMassDict);
 		//return BuildRangeTable(massToChargeX, massToChargeY);
-		return BuildRangeTable(rangeChartIons);
+		//return BuildRangeTable(rangeChartIons);
 	}
 
-	public static DataTable BuildRangeTable(List<Ion> ions)
+	public static DataTable BuildRangeTable(List<string> ions, Dictionary<string, float> symbolToMassDict)
 	{
 		DataTable rangeTable = new();
 
@@ -54,18 +36,18 @@ public static class SaxeyAddons
 		rangeTable.Columns.Add("_");
 		rangeTable.Columns.Add("__");
 		foreach(var ion in ions)
-			rangeTable.Columns.Add(ion.Symbol);
+			rangeTable.Columns.Add(ion);
 
 		//add secondary column information (ion weight)
 		List<object> row = new() { "", "" };
 		foreach (var ion in ions)
-			row.Add(ion.Mass.ToString("f2"));
+			row.Add(symbolToMassDict[ion].ToString("f2"));
 		rangeTable.Rows.Add(row.ToArray());
 
 		for(int i=0; i<ions.Count; i++)
 		{
-			Ion ion1 = rangeChartIons[i];
-			row = new() { ion1.Symbol, ion1.Mass.ToString("f2") };
+			var ion1Symbol = ions[i];
+			row = new() { ion1Symbol, symbolToMassDict[ion1Symbol].ToString("f2") };
 
 			//add spaces
 			for (int k = 0; k < i; k++)
@@ -73,8 +55,8 @@ public static class SaxeyAddons
 
 			for(int j=i; j<ions.Count; j++)
 			{
-				Ion ion2 = rangeChartIons[j];
-				var dtofSquared = Math.Pow(Math.Sqrt(ion1.Mass) - Math.Sqrt(ion2.Mass), 2);
+				var ion2Symbol = ions[j];
+				var dtofSquared = Math.Pow(Math.Sqrt(symbolToMassDict[ion1Symbol]) - Math.Sqrt(symbolToMassDict[ion2Symbol]), 2);
 				row.Add(dtofSquared.ToString("f2"));
 			}
 			rangeTable.Rows.Add(row.ToArray());
