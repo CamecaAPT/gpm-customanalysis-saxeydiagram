@@ -50,7 +50,7 @@ jobs:
 
       # Restore dependencies
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore -v d
       
       # Build
       - name: Build
