@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
 using Prism.Mvvm;
 
@@ -108,4 +109,12 @@ public class SaxeyDiagramOptions : BindableBase
 	//	get => atom2mc;
 	//	set => SetProperty (ref atom2mc, value);
 	//}
+
+	private ObservableCollection<string> ionSelections = new();
+	[Display(AutoGenerateField = false)]
+	public ObservableCollection<string> IonSelections
+	{
+		get => ionSelections;
+		set => SetProperty(ref ionSelections, value);
+	}
 }

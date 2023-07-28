@@ -39,7 +39,11 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	//private ObservableCollection<(float, float)> massToChargePairs;
 	//public ObservableCollection<(float, float)> MassToChargePairs => massToChargePairs;
 
-	public ObservableCollection<string> SelectedIons { get; set; } = new();
+	public ObservableCollection<string> SelectedIons
+	{
+		get => Options.IonSelections;
+		set => Options.IonSelections = value;
+	}
 
 	public ObservableObject<string> IonName { get; set; } = new();
 
