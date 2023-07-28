@@ -118,6 +118,8 @@ public static class SaxeyAddons
 
 	public static bool ValidateIon(string ion, List<string> selectedIons, Dictionary<string, float> symbolToMassDict)
 	{
+		if(ion == null) return false;
+
 		if(selectedIons.Contains(ion))
 		{
 			MessageBox.Show("Ion already added.");
