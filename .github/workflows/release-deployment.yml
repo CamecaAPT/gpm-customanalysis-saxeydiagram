@@ -14,10 +14,16 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
+    name: Build and Deploy to ${{ matrix.publish-feed }}
+    
+    strategy:
+      matrix:
+        publish-feed: ["${{ vars.FEED_EXTENSION }}", "${{ vars.FEED_EXTENSION_PREVIEW }}"]
+    
     uses: CamecaAPT/workflows/.github/workflows/build-deploy-gitversion.yml@main
     with:
       build-configuration: Release
       dotnet-version: ${{ vars.DOTNET_VERSION }}
-      azure-artifact-feed: ${{ vars.FEED_EXTENSION }}
+      azure-artifact-feed: ${{ matrix.publish-feed }}
     secrets:
       azure-package-read-write: ${{ secrets.AZURE_PACKAGE_READ_WRITE }}
