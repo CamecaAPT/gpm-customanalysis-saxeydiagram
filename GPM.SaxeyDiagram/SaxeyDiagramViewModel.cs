@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -145,6 +146,10 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		}
 
 		ReadOnlyMemory2D<float> saxeyData = (ReadOnlyMemory2D<float>)data[0];
+
+		var elements = ((IElementDataSet)data[6]).Elements;
+
+		var calculator = (IIonFormulaIsotopeCalculator)data[7];
 
 		List<ILineRenderData> saxeyLines = new();
 		if (Options.LineSelections.SaxeyDiagram)

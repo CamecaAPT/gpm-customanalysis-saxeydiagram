@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
@@ -24,8 +25,15 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 	public const string UniqueId = "GPM.CustomAnalysis.SaxeyDiagram.SaxeyDiagramNode";
 
-	public SaxeyDiagramNode(IAnalysisNodeBaseServices services) : base(services)
+	private readonly IElementDataSetService _elementDataSetService;
+	private readonly INodeElementDataSetProvider _nodeElementDataSetProvider;
+	private readonly IIonFormulaIsotopeCalculator _ionFormulaIsotopeCalculator;
+
+	public SaxeyDiagramNode(IAnalysisNodeBaseServices services, IElementDataSetService elementDataSetService, INodeElementDataSetProvider nodeElementDataSetProvider, IIonFormulaIsotopeCalculator ionFormulaIsotopeCalculator) : base(services)
 	{
+		_elementDataSetService = elementDataSetService;
+		_nodeElementDataSetProvider = nodeElementDataSetProvider;
+		_ionFormulaIsotopeCalculator = ionFormulaIsotopeCalculator;
 	}
 
 	public SaxeyDiagramOptions Options { get; private set; } = new();
@@ -69,6 +77,16 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 		var rangeTable = SaxeyAddons.BuildRangeTable(IonLineAndChartSelection);
 		toRet.Add(rangeTable);
+
+		var nodeElementDataset = _nodeElementDataSetProvider.Resolve(Services.IdProvider.Get(this));
+		var elementDataset = _elementDataSetService.GetElementDataSet(nodeElementDataset!.ElementDataSetId);
+		if (elementDataset != null)
+		{
+			toRet.Add(elementDataset);
+			toRet.Add(_ionFormulaIsotopeCalculator);
+		}
+		else
+			throw new Exception("problem with getting the element dataset");
 
 		if (Options.ExportToCsv)
 		{
