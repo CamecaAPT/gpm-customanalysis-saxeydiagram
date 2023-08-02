@@ -97,22 +97,6 @@ public class SaxeyDiagramOptions : BindableBase
 	[Display(Name = "Where to show lines", Description = "Which graphs to render lines onto.")]
 	public LineSelections LineSelections { get; set; } = new LineSelections();
 
-	//private float atom1mc;
-	//[Display(Name = "Atom 1 m/c")]
-	//public float Atom1mc
-	//{
-	//	get => atom1mc;
-	//	set => SetProperty(ref atom1mc, value);
-	//}
-
-	//private float atom2mc;
-	//[Display(Name = "Atom 2 m/c")]
-	//public float Atom2mc
-	//{
-	//	get => atom2mc;
-	//	set => SetProperty (ref atom2mc, value);
-	//}
-
 	private ObservableCollection<string> ionSelections = new();
 	[Display(AutoGenerateField = false)]
 	public ObservableCollection<string> IonSelections
@@ -128,12 +112,4 @@ public class SaxeyDiagramOptions : BindableBase
 		get => chargeCounts;
 		set => SetProperty(ref chargeCounts, value);
 	}
-
-	//private List<IonFormula> ionFormulas = new();
-	//[Display(AutoGenerateField = false)]
-	//public List<IonFormula> IonFormulas
-	//{
-	//	get => ionFormulas;
-	//	set => SetProperty(ref ionFormulas, value);
-	//}
 }

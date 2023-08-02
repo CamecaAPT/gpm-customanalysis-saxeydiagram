@@ -66,8 +66,6 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 		toRet.Add(new ReadOnlyMemory2D<float>(saxey.Map, Options.EdgeSize, Options.EdgeSize));
 
-		//var sqrtChart = SaxeyAddons.BuildSqrtChart(saxey.Map, Options.EdgeSize, Options.Resolution, out var newResolution);
-
 		var sqrtChart = SaxeyAddons.BuildSqrtChart(saxey.Points, Options.EdgeSize, Options.Resolution, out var newResolution, out var newPhysicalSideLength);
 
 		toRet.Add(sqrtChart);
@@ -77,9 +75,6 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 		toRet.Add(multisChart);
 		toRet.Add(maxHeight);
-
-		//var rangeTable = SaxeyAddons.BuildRangeTable(IonLineAndChartSelection, Elements);
-		//toRet.Add(rangeTable);
 
 		var nodeElementDataset = _nodeElementDataSetProvider.Resolve(Services.IdProvider.Get(this));
 		var elementDataset = _elementDataSetService.GetElementDataSet(nodeElementDataset!.ElementDataSetId);

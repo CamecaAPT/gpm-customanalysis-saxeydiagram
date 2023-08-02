@@ -37,9 +37,6 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	private readonly RelayCommand removeLines;
 	public ICommand RemoveLinesCommand => removeLines;
 
-	//private ObservableCollection<(float, float)> massToChargePairs;
-	//public ObservableCollection<(float, float)> MassToChargePairs => massToChargePairs;
-
 	public ObservableCollection<string> SelectedIons
 	{
 		get => Options.IonSelections;
@@ -51,12 +48,6 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		get => Options.ChargeCounts;
 		private set => Options.ChargeCounts = value;
 	}
-
-	//public List<IonFormula> IonFormulas
-	//{
-	//	get => Options.IonFormulas;
-	//	set => Options.IonFormulas = value;
-	//}
 
 	public ObservableObject<string> IonName { get; set; } = new();
 
@@ -86,7 +77,6 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		colorMap = CreateBrightColorMap(colorMapFactory);
 		addLine = new RelayCommand(OnAddLine);
 		removeLines = new RelayCommand(OnRemoveLines);
-		//massToChargePairs = new();
 		listViewDoubleClick = new RelayCommand(OnListViewDoubleClick);
 	}
 
@@ -133,14 +123,6 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 					runCommand.Execute(null);
 				}
 			}
-
-			//if (SaxeyAddons.ValidateIon(IonName.Value, SelectedIons.ToList(), Node.Elements, out var ionStr, out var chargeCount))
-			//{
-			//	SelectedIons.Add(ionStr!);
-			//	ChargeCounts.Add(chargeCount);
-			//	IonName.Value = "";
-			//	runCommand.Execute(null);
-			//}
 		}
 	}
 
@@ -152,7 +134,6 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		{
 			SelectedIons.RemoveAt(index);
 			ChargeCounts.RemoveAt(index);
-			//IonFormulas.RemoveAt(index);
 			runCommand.Execute(null);
 		}
 	}
@@ -161,7 +142,6 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	{
 		SelectedIons.Clear();
 		ChargeCounts.Clear();
-		//IonFormulas.Clear();
 		runCommand.Execute(null);
 	}
 
@@ -208,9 +188,9 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		List<ILineRenderData> saxeyLines = new();
 		if (Options.LineSelections.SaxeyDiagram)
 		{
-			//List<Vector3[]> lineSaxeyPoints = SaxeyAddons.GetLinesSaxey(linesOptions, Options.MassExtent);
-			//foreach (var line in lineSaxeyPoints)
-			//	saxeyLines.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
+			List<Vector3[]> lineSaxeyPoints = SaxeyAddons.GetLinesSaxey(linesOptions, Options.MassExtent);
+			foreach (var line in lineSaxeyPoints)
+				saxeyLines.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
 		}
 
 		var renderData = renderDataFactory.CreateHistogram2D(
@@ -240,28 +220,25 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		List<ILineRenderData> lines2D = new();
 		if (Options.LineSelections.LinearizedDiagram)
 		{
-			//List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(linesOptions, Options.MassExtent);
-			//foreach (var line in line2DPoints)
-			//	lines2D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
+			List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(linesOptions, Options.MassExtent);
+			foreach (var line in line2DPoints)
+				lines2D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
 		}
 
 		List<ILineRenderData> lines1D = new();
 		if (Options.LineSelections.CalculatedMassSpectrum)
 		{
-			//int maxHeight = (int)data[4];
-			//List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(linesOptions, maxHeight);
-			//foreach (var line in line1DPoints)
-			//	lines1D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
+			int maxHeight = (int)data[4];
+			List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(linesOptions, maxHeight);
+			foreach (var line in line1DPoints)
+				lines1D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
 		}
-
-
 
 		var saxeyAddonsViewModel = new Histogram2DHistogram1DSideBySideViewModel(
 			"Time Space and Multi Atom Mass Spectrum",
 			sqrtRenderData, multisRenderData, lines2D, lines1D);
 		Tabs.Add(saxeyAddonsViewModel);
 
-		//DataTable rangeTable = (DataTable)data[5];
 		DataTable rangeTable = SaxeyAddons.BuildRangeTable(linesOptions);
 		var rangeTableViewModel = new RangeTableViewModel("Range Table", rangeTable);
 		if (rangeTable.Rows.Count > 0)

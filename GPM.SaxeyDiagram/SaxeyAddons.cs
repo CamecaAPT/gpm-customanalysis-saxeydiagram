@@ -74,20 +74,17 @@ public static class SaxeyAddons
 		return true;
 	}
 
-	public static DataTable BuildRangeTable(LinesOptions linesOptions)
+	public static Dictionary<string, List<float>> MakeSymbolToMassDict(LinesOptions linesOptions)
 	{
-		DataTable rangeTable = new();
 		var selectedSymbols = linesOptions.selectedSymbols;
 		var selectedCharges = linesOptions.selectedCharges;
 		var elements = linesOptions.elements;
 		var calculator = linesOptions.calculator;
 		var calculatorOptions = linesOptions.calculatorOptions;
 
-		if (selectedSymbols.Count == 0) return rangeTable;
-
 		//TODO: clean this up perhaps
 		List<IonFormula> selectedIons = new();
-		foreach(var symbol in selectedSymbols)
+		foreach (var symbol in selectedSymbols)
 		{
 			ValidateIonString(symbol, out var match);
 			selectedIons.Add(IonFormulaFromMatch(match, elements, out var _)!);
@@ -109,6 +106,17 @@ public static class SaxeyAddons
 				symbolToMassDict[sym].Add((float)isotope.Mass / charge);
 		}
 
+		return symbolToMassDict;
+	}
+
+	public static DataTable BuildRangeTable(LinesOptions linesOptions)
+	{
+		DataTable rangeTable = new();
+		var selectedSymbols = linesOptions.selectedSymbols;
+
+		if (selectedSymbols.Count == 0) return rangeTable;
+
+		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
 
 		//Add Columns
 		rangeTable.Columns.Add();
@@ -189,99 +197,151 @@ public static class SaxeyAddons
 		return rangeTable;
 	}
 
-	//public static List<Vector3[]> GetLinesSaxey(LinesOptions linesOptions, float maxHeight)
-	//{
-	//	List<Vector3[]> lines = new();
+	public static List<Vector3[]> GetLinesSaxey(LinesOptions linesOptions, float maxHeight)
+	{
+		List<Vector3[]> lines = new();
 
-	//	//y = ( sqrt(x) + (m2/c2 - m1/c1) )^2
+		var selectedSymbols = linesOptions.selectedSymbols;
+		var selectedCharges = linesOptions.selectedCharges;
+		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
 
-	//	//this is essentially the resolution of the line
-	//	const float deltaX = .1f;
+		//y = ( sqrt(x) + (m2/c2 - m1/c1) )^2
 
-	//	for(int i=0; i<selectedSymbols.Count; i++)
-	//	{
-	//		var ion1Sym = selectedSymbols[i];
-	//		var ion1 = elements[ion1Sym];
-	//		var ion1Charge = selectedCharges[i];
-	//		var ion1Mass = symbolToMassDict[ion1];
-	//		for(int j=i+1; j<selectedSymbols.Count; j++)
-	//		{
-	//			var ion2 = selectedSymbols[j];
-	//			var ion2Charge = selectedCharges[j];
-	//			var ion2Mass = symbolToMassDict[ion2];
-	//			List<Vector3> line = new();
-	//			float xVal = 0f;
-	//			float yVal = 0f;
-	//			var dtof = Math.Abs(Math.Sqrt(ion1Mass) - Math.Sqrt(ion2Mass));
-	//			do
-	//			{
-	//				yVal = (float)Math.Pow(Math.Sqrt(xVal) + dtof, 2);
-	//				line.Add(new Vector3(xVal, -1, yVal));
-	//				xVal += deltaX;
-	//			} while (yVal <= maxHeight && xVal <= maxHeight);
-	//			lines.Add(line.ToArray());
-	//		}
-	//	}
+		//this is essentially the resolution of the line
+		const float deltaX = .1f;
 
-	//	return lines;
-	//}
+		HashSet<(float, float)> addedLinesSet = new();
+		for (int i = 0; i < selectedSymbols.Count; i++)
+		{
+			var ion1Sym = selectedSymbols[i];
+			var ion1Charge = selectedCharges[i];
+			var ion1Masses = symbolToMassDict[ion1Sym];
 
-	//public static List<Vector3[]> GetLines2D(LinesOptions linesOptions, float height)
-	//{
-	//	List<Vector3[]> lines = new();
-	//	float h = (float)Math.Sqrt(height);
+			foreach(var mass1 in ion1Masses)
+			{
+				for (int j = i + 1; j < selectedSymbols.Count; j++)
+				{
+					var ion2Sym = selectedSymbols[j];
+					var ion2Charge = selectedCharges[j];
+					var ion2Masses = symbolToMassDict[ion2Sym];
 
-	//	for(int i=0; i<selectedSymbols.Count; i++)
-	//	{
-	//		var ion1 = selectedSymbols[i];
-	//		var ion1Mass = symbolToMassDict[ion1];
-	//		for(int j=i+1; j<selectedSymbols.Count; j++)
-	//		{
-	//			var ion2 = selectedSymbols[j];
-	//			var ion2Mass = symbolToMassDict[ion2];
+					foreach(var mass2 in ion2Masses)
+					{
+						if(!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
+						{
+							List<Vector3> line = new();
+							float xVal = 0f;
+							float yVal = 0f;
+							var dtof = Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
+							addedLinesSet.Add((mass1, mass2));
+							addedLinesSet.Add((mass2, mass1));
+							do
+							{
+								yVal = (float)Math.Pow(Math.Sqrt(xVal) + dtof, 2);
+								line.Add(new Vector3(xVal, -1, yVal));
+								xVal += deltaX;
+							} while (yVal <= maxHeight && xVal <= maxHeight);
+							lines.Add(line.ToArray());
+						}
+					}
+				}
+			}
+		}
 
-	//			float dtof = (float)Math.Abs(Math.Sqrt(ion1Mass) - Math.Sqrt(ion2Mass));
-	//			Vector3 point1 = new Vector3(0, -1, dtof);
-	//			Vector3 point2 = new Vector3(h - dtof, -1, h);
+		return lines;
+	}
 
-	//			Vector3[] arr = new Vector3[2];
-	//			arr[0] = point1;
-	//			arr[1] = point2;
-	//			lines.Add(arr);
-	//		}
-	//	}
+	public static List<Vector3[]> GetLines2D(LinesOptions linesOptions, float height)
+	{
+		List<Vector3[]> lines = new();
+		float h = (float)Math.Sqrt(height);
+
+		var selectedSymbols = linesOptions.selectedSymbols;
+		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
+
+		HashSet<(float, float)> addedLinesSet = new();
+		for (int i = 0; i < selectedSymbols.Count; i++)
+		{
+			var ion1 = selectedSymbols[i];
+			var ion1Masses = symbolToMassDict[ion1];
+
+			foreach(var mass1 in ion1Masses)
+			{
+				for (int j = i + 1; j < selectedSymbols.Count; j++)
+				{
+					var ion2 = selectedSymbols[j];
+					var ion2Masses = symbolToMassDict[ion2];
+
+					foreach(var mass2 in ion2Masses)
+					{
+						if(!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
+						{
+							addedLinesSet.Add((mass1, mass2));
+							addedLinesSet.Add((mass2, mass1));
+
+							float dtof = (float)Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
+							Vector3 point1 = new Vector3(0, -1, dtof);
+							Vector3 point2 = new Vector3(h - dtof, -1, h);
+
+							Vector3[] arr = new Vector3[2];
+							arr[0] = point1;
+							arr[1] = point2;
+							lines.Add(arr);
+						}
+					}
+				}
+			}
+		}
 
 
-	//	return lines;
-	//}
+		return lines;
+	}
 
-	//public static List<Vector3[]> GetLines1D(LinesOptions linesOptions, int maxHeight)
-	//{
-	//	List<Vector3[]> lines = new();
+	public static List<Vector3[]> GetLines1D(LinesOptions linesOptions, int maxHeight)
+	{
+		List<Vector3[]> lines = new();
 
-	//	for(int i=0; i<selectedSymbols.Count; i++)
-	//	{
-	//		var ion1 = selectedSymbols[i];
-	//		var ion1Mass = symbolToMassDict[ion1];
-	//		for(int j=i+1; j<selectedSymbols.Count; j++)
-	//		{
-	//			var ion2 = selectedSymbols[j];
-	//			var ion2Mass = symbolToMassDict[ion2];
+		var selectedSymbols = linesOptions.selectedSymbols;
+		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
 
-	//			float dtof = (float)Math.Abs(Math.Sqrt(ion1Mass) - Math.Sqrt(ion2Mass));
-	//			var dtofSquared = dtof * dtof;
-	//			Vector3 point1 = new(dtofSquared, -1, 0);
-	//			Vector3 point2 = new(dtofSquared, -1, maxHeight);
+		HashSet<(float, float)> addedLinesSet = new();
 
-	//			Vector3[] arr = new Vector3[2];
-	//			arr[0] = point1;
-	//			arr[1] = point2;
-	//			lines.Add(arr);
-	//		}
-	//	}
+		for (int i = 0; i < selectedSymbols.Count; i++)
+		{
+			var ion1 = selectedSymbols[i];
+			var ion1Masses = symbolToMassDict[ion1];
 
-	//	return lines;
-	//}
+			foreach(var mass1 in ion1Masses)
+			{
+				for (int j = i + 1; j < selectedSymbols.Count; j++)
+				{
+					var ion2 = selectedSymbols[j];
+					var ion2Masses = symbolToMassDict[ion2];
+
+					foreach(var mass2 in ion2Masses)
+					{
+						if(!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
+						{
+							addedLinesSet.Add((mass1, mass2));
+							addedLinesSet.Add((mass2, mass1));
+
+							float dtof = (float)Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
+							var dtofSquared = dtof * dtof;
+							Vector3 point1 = new(dtofSquared, -1, 0);
+							Vector3 point2 = new(dtofSquared, -1, maxHeight);
+
+							Vector3[] arr = new Vector3[2];
+							arr[0] = point1;
+							arr[1] = point2;
+							lines.Add(arr);
+						}
+					}
+				}
+			}
+		}
+
+		return lines;
+	}
 
 
 
