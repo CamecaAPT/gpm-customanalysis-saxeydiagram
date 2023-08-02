@@ -4,266 +4,292 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.Mail;
 using System.Numerics;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
 public static class SaxeyAddons
 {
-	private static List<string> massToChargeXIons = new() { "Ga+++(1)", "Ga+++(2)", "N2+", "NH2+", "Ga++(1)", "Ga++(2)", "GaN++(1)", "GaN++(2)", "N3+", "Ga+(1)", "Ga+(2)" }; 
-	private static List<float> massToChargeX = new() { 23, 23.7f, 28, 29, 34.5f, 35.5f, 41.5f, 42.5f, 42, 69, 71 };
+	//if running this method, assume that already ran through regex and it is good
+	public static IonFormula? IonFormulaFromMatch(Match match, Dictionary<string, IElement> elements, out int? chargeCount)
+	{
+		List<IonFormula.Component> components = new();
+		chargeCount = null;
 
-	private static List<string> massToChargeYIons = new() { "H+", "H2+", "N++", "N+", "Ga+++(1)", "Ga+++(2)", "N2+", "NH2+", "NH2+", "Ga++(1)", "Ga++(2)", "GaN3++(1)", "GaN3++(2)", "Ga+(1)", "Ga+(2)" };
-	private static List<float> massToChargeY = new() { 1, 2, 7, 14, 23, 23.7f, 28, 29, 34.5f, 35.5f, 55.5f, 56.5f, 69, 71 };
+		var groups = match.Groups.Values.ToList();
 
+		foreach(var fullSymbol in groups[1].Captures.ToList())
+		{
+			var fullSymArr = fullSymbol.Value.ToCharArray();
+			int numericIndex = 0;
+			foreach( var sym in fullSymArr)
+			{
+				if (sym >= 48 && sym <= 57)
+					break;
+				numericIndex++;
+			}
+
+			string element = fullSymbol.Value.Substring(0, numericIndex);
+			int num;
+			if (numericIndex == fullSymbol.Value.Length)
+				num = 1;
+			else
+				num = int.Parse(fullSymbol.Value.Substring(numericIndex, fullSymbol.Value.Length - numericIndex));
+
+			if(!elements.ContainsKey(element))
+			{
+				MessageBox.Show($"{element} is not a valid element");
+				return null;
+			}
+
+			components.Add(new IonFormula.Component(element, num));
+		}
+
+		chargeCount = groups[2].Value.Length;
+		if (chargeCount == 0)
+			chargeCount = 1;
+
+		IonFormula formula = new(components);
+		return formula;
+	}
 
 	/*
-	 * Dummy Data Method
+	 * Make sure has only alphanumerics and + signs
+	 * also, once theres a plus it can only be plusses
 	 */
-	public static DataTable BuildRangeTable(List<string> selectedIons)
+	public static bool ValidateIonString(string ionString, out Match match)
 	{
-		return BuildRangeTable(selectedIons, symbolToMassDict);
-		//return BuildRangeTable(massToChargeX, massToChargeY);
-		//return BuildRangeTable(rangeChartIons);
-	}
-
-	public static DataTable BuildRangeTable(List<string> ions, Dictionary<string, float> symbolToMassDict)
-	{
-		DataTable rangeTable = new();
-
-		if (ions.Count == 0) return rangeTable;
-
-		//Add Columns
-		rangeTable.Columns.Add("_");
-		rangeTable.Columns.Add("__");
-		foreach(var ion in ions)
-			rangeTable.Columns.Add(ion);
-
-		//add secondary column information (ion weight)
-		List<object> row = new() { "", "" };
-		foreach (var ion in ions)
-			row.Add(symbolToMassDict[ion].ToString("f2"));
-		rangeTable.Rows.Add(row.ToArray());
-
-		for(int i=0; i<ions.Count; i++)
+		Regex regex = new(@"(?:([A-Z][a-z]?\d*))+([+]{0,5})");
+		match = regex.Match(ionString);
+		if(!match.Success || match.Value != ionString)
 		{
-			var ion1Symbol = ions[i];
-			row = new() { ion1Symbol, symbolToMassDict[ion1Symbol].ToString("f2") };
-
-			//add spaces
-			for (int k = 0; k < i; k++)
-				row.Add("");
-
-			for(int j=i; j<ions.Count; j++)
-			{
-				var ion2Symbol = ions[j];
-				var dtofSquared = Math.Pow(Math.Sqrt(symbolToMassDict[ion1Symbol]) - Math.Sqrt(symbolToMassDict[ion2Symbol]), 2);
-				row.Add(dtofSquared.ToString("f2"));
-			}
-			rangeTable.Rows.Add(row.ToArray());
-		}
-
-		return rangeTable;
-	}
-
-	public static DataTable BuildRangeTable(List<float> massToChargeX, List<float> massToChargeY)
-	{
-		DataTable rangeTable = new();
-
-		//Add Columns
-		rangeTable.Columns.Add("_");
-		rangeTable.Columns.Add("__");
-		foreach (var xLabel in massToChargeXIons)
-			rangeTable.Columns.Add(xLabel);
-
-		for (int i = 0; i < massToChargeY.Count; i++)
-		{
-			var massY = massToChargeY[i];
-			List<object> row = new();
-			row.Add(massToChargeYIons[i]);
-			row.Add(massY.ToString("f2"));
-			foreach (var massX in massToChargeX)
-			{
-				var dtofSquared = Math.Pow(Math.Sqrt(massX) - Math.Sqrt(massY), 2);
-				row.Add(dtofSquared.ToString("f2"));
-			}
-			rangeTable.Rows.Add(row.ToArray());
-		}
-
-
-		return rangeTable;
-	}
-
-	//Dummy Data
-	private static List<float> DTOFsOfInterest = new() { 20.8f, 9.1f, 5.9f, 2.4f, .3f};
-
-	private static List<(float, float)> massToChargePairs = new() { (14, 69), (28, 69), (34.5f, 69), (14, 28), (28, 34.5f) };
-
-	private static Dictionary<string, float> symbolToMassDict = new()
-	{
-		{ "N+", 14 },
-		{ "N2+", 28 },
-		{ "Ga+", 69 },
-		{ "Ga++", 34.5f }
-	};
-
-	/*
-	 * Dummy Data
-	 */
-	public static bool ValidateIon(string ion, List<string> selectedIons)
-	{
-		return ValidateIon(ion, selectedIons, symbolToMassDict);
-	}
-
-	public static bool ValidateIon(string ion, List<string> selectedIons, Dictionary<string, float> symbolToMassDict)
-	{
-		if(ion == null) return false;
-
-		if(selectedIons.Contains(ion))
-		{
-			MessageBox.Show("Ion already added.");
+			MessageBox.Show("Invalid format for Ion");
 			return false;
 		}
-
-		if(!symbolToMassDict.Keys.Contains(ion))
-		{
-			MessageBox.Show("Unknown Ion");
-			return false;
-		}
-
 		return true;
 	}
 
-
-	/*
-	 * CURRENTLY IS HARDCODED DUMMY DATA
-	 */
-	public static List<Vector3[]> GetLinesSaxey(float maxHeight)
+	public static Dictionary<string, List<float>> MakeSymbolToMassDict(LinesOptions linesOptions)
 	{
-		return GetLinesSaxey(massToChargePairs, maxHeight);
-	}
-	public static List<Vector3[]> GetLinesSaxey(List<string> selectedSymbols, float maxHeight)
-	{
-		return GetLinesSaxey(selectedSymbols, symbolToMassDict, maxHeight);
-	}
+		var selectedSymbols = linesOptions.selectedSymbols;
+		var selectedCharges = linesOptions.selectedCharges;
+		var elements = linesOptions.elements;
+		var calculator = linesOptions.calculator;
+		var calculatorOptions = linesOptions.calculatorOptions;
 
-	public static List<Vector3[]> GetLinesSaxey(List<(float, float)> massToChargePairs, float maxHeight)
-	{
-		List<Vector3[]> lines = new();
-
-		//y = ( sqrt(x) + (m2/c2 - m1/c1) )^2
-
-		//this is essentially the resolution of the line
-		const float deltaX = .1f;
-		
-		foreach(var massToChargePair in massToChargePairs)
+		//TODO: clean this up perhaps
+		List<IonFormula> selectedIons = new();
+		foreach (var symbol in selectedSymbols)
 		{
-			List<Vector3> line = new();
-			float xVal = 0f;
-			float yVal = 0f;
-			var dtof = Math.Abs(Math.Sqrt(massToChargePair.Item1) - Math.Sqrt(massToChargePair.Item2));
-			do
-			{
-				yVal = (float)Math.Pow(Math.Sqrt(xVal) + dtof, 2);
-				line.Add(new Vector3(xVal, -1, yVal));
-				xVal += deltaX;
-			} while (yVal <= maxHeight && xVal <= maxHeight);
-			lines.Add(line.ToArray());
+			ValidateIonString(symbol, out var match);
+			selectedIons.Add(IonFormulaFromMatch(match, elements, out var _)!);
 		}
 
-		return lines;
+		Dictionary<string, List<float>> symbolToMassDict = new();
+
+		for (int i = 0; i < selectedIons.Count; i++)
+		{
+			var sym = selectedSymbols[i];
+			var formula = selectedIons[i];
+			var charge = selectedCharges[i];
+			if (!symbolToMassDict.ContainsKey(sym))
+				symbolToMassDict.Add(sym, new());
+
+			var isotopes = calculator.GetIsotopes(formula, calculatorOptions);
+
+			foreach (var isotope in isotopes)
+				symbolToMassDict[sym].Add((float)isotope.Mass / charge);
+		}
+
+		return symbolToMassDict;
 	}
 
-	public static List<Vector3[]> GetLinesSaxey(List<string> selectedSymbols, Dictionary<string, float> symbolToMassDict, float maxHeight)
+	public static DataTable BuildRangeTable(LinesOptions linesOptions)
 	{
-		List<Vector3[]> lines = new();
+		DataTable rangeTable = new();
+		var selectedSymbols = linesOptions.selectedSymbols;
 
-		//y = ( sqrt(x) + (m2/c2 - m1/c1) )^2
+		if (selectedSymbols.Count == 0) return rangeTable;
 
-		//this is essentially the resolution of the line
-		const float deltaX = .1f;
+		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
 
-		for(int i=0; i<selectedSymbols.Count; i++)
+		//Add Columns
+		rangeTable.Columns.Add();
+		rangeTable.Columns.Add();
+		foreach (var symbolMassesPair in symbolToMassDict)
 		{
-			var ion1 = selectedSymbols[i];
-			var ion1Mass = symbolToMassDict[ion1];
-			for(int j=i+1; j<selectedSymbols.Count; j++)
+			foreach(var _ in symbolMassesPair.Value)
+				rangeTable.Columns.Add();
+		}
+
+		//add what we want for column headers
+		List<object> row = new() { "", "" };
+		foreach (var symbolMassesPair in symbolToMassDict)
+		{
+			foreach(var _ in symbolMassesPair.Value)
+				row.Add(symbolMassesPair.Key);
+		}
+		rangeTable.Rows.Add(row.ToArray());
+
+		//add secondary column information (ion weight)
+		row = new() { "", "" };
+		foreach (var symbolMassesPair in symbolToMassDict)
+		{
+			foreach(var mass in symbolMassesPair.Value)
+				row.Add(mass.ToString("f2"));
+		}
+		rangeTable.Rows.Add(row.ToArray());
+
+		HashSet<(float, float)> addedToTableSet = new();
+		var keys = symbolToMassDict.Keys.ToList();
+		int rowCount = 0;
+		for (int i = 0; i < keys.Count; i++)
+		{
+			var ion1Formula = keys[i];
+			var ion1Masses = symbolToMassDict[ion1Formula];
+
+			foreach(var mass1 in ion1Masses)
 			{
-				var ion2 = selectedSymbols[j];
-				var ion2Mass = symbolToMassDict[ion2];
-				List<Vector3> line = new();
-				float xVal = 0f;
-				float yVal = 0f;
-				var dtof = Math.Abs(Math.Sqrt(ion1Mass) - Math.Sqrt(ion2Mass));
-				do
+				row = new() { ion1Formula, mass1.ToString("f2") };
+
+				//add spaces
+				//for (int k = 0; k < rowCount; k++)
+				//	row.Add("");
+
+				for (int j = 0; j < keys.Count; j++)
 				{
-					yVal = (float)Math.Pow(Math.Sqrt(xVal) + dtof, 2);
-					line.Add(new Vector3(xVal, -1, yVal));
-					xVal += deltaX;
-				} while (yVal <= maxHeight && xVal <= maxHeight);
-				lines.Add(line.ToArray());
+					var ion2Formula = keys[j];
+					var ion2Masses = symbolToMassDict[ion2Formula];
+
+					foreach(var mass2 in ion2Masses)
+					{
+						var dtofSquared = Math.Pow(Math.Sqrt(mass1) - Math.Sqrt(mass2), 2);
+						//string toAdd;
+						//if (dtofSquared == 0)
+						//	toAdd = "";
+						//else
+						//	toAdd = dtofSquared.ToString("f2");
+
+						if(dtofSquared == 0)
+							row.Add(dtofSquared.ToString("f2"));
+						else if (!addedToTableSet.Contains((mass1, mass2)) && !addedToTableSet.Contains((mass2, mass1)))
+						{
+							row.Add(dtofSquared.ToString("f2"));
+							addedToTableSet.Add((mass1, mass2));
+							addedToTableSet.Add((mass2, mass1));
+						}
+						else
+							row.Add("");
+
+						
+					}
+				}
+				rangeTable.Rows.Add(row.ToArray());
+				rowCount++;
+			}
+		}
+
+		return rangeTable;
+	}
+
+	public static List<Vector3[]> GetLinesSaxey(LinesOptions linesOptions, float maxHeight)
+	{
+		List<Vector3[]> lines = new();
+
+		var selectedSymbols = linesOptions.selectedSymbols;
+		var selectedCharges = linesOptions.selectedCharges;
+		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
+
+		//y = ( sqrt(x) + (m2/c2 - m1/c1) )^2
+
+		//this is essentially the resolution of the line
+		const float deltaX = .1f;
+
+		HashSet<(float, float)> addedLinesSet = new();
+		for (int i = 0; i < selectedSymbols.Count; i++)
+		{
+			var ion1Sym = selectedSymbols[i];
+			var ion1Charge = selectedCharges[i];
+			var ion1Masses = symbolToMassDict[ion1Sym];
+
+			foreach(var mass1 in ion1Masses)
+			{
+				for (int j = i + 1; j < selectedSymbols.Count; j++)
+				{
+					var ion2Sym = selectedSymbols[j];
+					var ion2Charge = selectedCharges[j];
+					var ion2Masses = symbolToMassDict[ion2Sym];
+
+					foreach(var mass2 in ion2Masses)
+					{
+						if(!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
+						{
+							List<Vector3> line = new();
+							float xVal = 0f;
+							float yVal = 0f;
+							var dtof = Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
+							addedLinesSet.Add((mass1, mass2));
+							addedLinesSet.Add((mass2, mass1));
+							do
+							{
+								yVal = (float)Math.Pow(Math.Sqrt(xVal) + dtof, 2);
+								line.Add(new Vector3(xVal, -1, yVal));
+								xVal += deltaX;
+							} while (yVal <= maxHeight && xVal <= maxHeight);
+							lines.Add(line.ToArray());
+						}
+					}
+				}
 			}
 		}
 
 		return lines;
 	}
 
-	/*
-	 * CURRENTLY IS HARDCODED DUMMY DATA
-	 */
-	public static List<Vector3[]> GetLines2D(float maxHeight)
+	public static List<Vector3[]> GetLines2D(LinesOptions linesOptions, float height)
 	{
-		return GetLines2D(massToChargePairs, maxHeight);
-	}
-	public static List<Vector3[]> GetLines2D(List<string> selectedSymbols, float maxHeight)
-	{
-		return GetLines2D(selectedSymbols, symbolToMassDict, maxHeight);
-	}
-
-	public static List<Vector3[]> GetLines2D(List<(float, float)> massToChargePairs, float height)
-	{
+		List<Vector3[]> lines = new();
 		float h = (float)Math.Sqrt(height);
 
-		List<Vector3[]> lines = new();
+		var selectedSymbols = linesOptions.selectedSymbols;
+		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
 
-		foreach(var massToChargePair in massToChargePairs)
-		{
-			float dtof = (float)Math.Abs(Math.Sqrt(massToChargePair.Item1) - Math.Sqrt(massToChargePair.Item2));
-			Vector3 point1 = new Vector3(0, -1, dtof);
-			Vector3 point2 = new Vector3(h - dtof, -1, h);
-
-			Vector3[] arr = new Vector3[2];
-			arr[0] = point1;
-			arr[1] = point2;
-			lines.Add(arr);
-		}
-
-		return lines;
-	}
-
-	public static List<Vector3[]> GetLines2D(List<string> selectedSymbols, Dictionary<string, float> symbolToMassDict, float height)
-	{
-		List<Vector3[]> lines = new();
-		float h = (float)Math.Sqrt(height);
-
-		for(int i=0; i<selectedSymbols.Count; i++)
+		HashSet<(float, float)> addedLinesSet = new();
+		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
 			var ion1 = selectedSymbols[i];
-			var ion1Mass = symbolToMassDict[ion1];
-			for(int j=i+1; j<selectedSymbols.Count; j++)
+			var ion1Masses = symbolToMassDict[ion1];
+
+			foreach(var mass1 in ion1Masses)
 			{
-				var ion2 = selectedSymbols[j];
-				var ion2Mass = symbolToMassDict[ion2];
+				for (int j = i + 1; j < selectedSymbols.Count; j++)
+				{
+					var ion2 = selectedSymbols[j];
+					var ion2Masses = symbolToMassDict[ion2];
 
-				float dtof = (float)Math.Abs(Math.Sqrt(ion1Mass) - Math.Sqrt(ion2Mass));
-				Vector3 point1 = new Vector3(0, -1, dtof);
-				Vector3 point2 = new Vector3(h - dtof, -1, h);
+					foreach(var mass2 in ion2Masses)
+					{
+						if(!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
+						{
+							addedLinesSet.Add((mass1, mass2));
+							addedLinesSet.Add((mass2, mass1));
 
-				Vector3[] arr = new Vector3[2];
-				arr[0] = point1;
-				arr[1] = point2;
-				lines.Add(arr);
+							float dtof = (float)Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
+							Vector3 point1 = new Vector3(0, -1, dtof);
+							Vector3 point2 = new Vector3(h - dtof, -1, h);
+
+							Vector3[] arr = new Vector3[2];
+							arr[0] = point1;
+							arr[1] = point2;
+							lines.Add(arr);
+						}
+					}
+				}
 			}
 		}
 
@@ -271,65 +297,53 @@ public static class SaxeyAddons
 		return lines;
 	}
 
-	/*
-	 * CURRENTLY IS HARDCODED DUMMY DATA
-	 */
-	public static List<Vector3[]> GetLines1D(int maxHeight)
-	{
-		return GetLines1D(massToChargePairs, maxHeight);
-	}
-	public static List<Vector3[]> GetLines1D(List<string> selectedSymbols, int maxHeight)
-	{
-		return GetLines1D(selectedSymbols, symbolToMassDict, maxHeight);
-	}
-
-	public static List<Vector3[]> GetLines1D(List<(float, float)> massToChargePairs, int maxHeight)
+	public static List<Vector3[]> GetLines1D(LinesOptions linesOptions, int maxHeight)
 	{
 		List<Vector3[]> lines = new();
 
-		foreach(var massToChargePair in massToChargePairs)
-		{
-			float dtof = (float)Math.Abs(Math.Sqrt(massToChargePair.Item1) - Math.Sqrt(massToChargePair.Item2));
-			var dtofSquared = dtof * dtof;
-			Vector3 point1 = new(dtofSquared, -1, 0);
-			Vector3 point2 = new(dtofSquared, -1, maxHeight);
+		var selectedSymbols = linesOptions.selectedSymbols;
+		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
 
-			Vector3[] arr = new Vector3[2];
-			arr[0] = point1;
-			arr[1] = point2;
-			lines.Add(arr);
-		}
+		HashSet<(float, float)> addedLinesSet = new();
 
-		return lines;
-	}
-
-	public static List<Vector3[]> GetLines1D(List<string> selectedSymbols, Dictionary<string, float> symbolToMassDict, int maxHeight)
-	{
-		List<Vector3[]> lines = new();
-
-		for(int i=0; i<selectedSymbols.Count; i++)
+		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
 			var ion1 = selectedSymbols[i];
-			var ion1Mass = symbolToMassDict[ion1];
-			for(int j=i+1; j<selectedSymbols.Count; j++)
+			var ion1Masses = symbolToMassDict[ion1];
+
+			foreach(var mass1 in ion1Masses)
 			{
-				var ion2 = selectedSymbols[j];
-				var ion2Mass = symbolToMassDict[ion2];
+				for (int j = i + 1; j < selectedSymbols.Count; j++)
+				{
+					var ion2 = selectedSymbols[j];
+					var ion2Masses = symbolToMassDict[ion2];
 
-				float dtof = (float)Math.Abs(Math.Sqrt(ion1Mass) - Math.Sqrt(ion2Mass));
-				var dtofSquared = dtof * dtof;
-				Vector3 point1 = new(dtofSquared, -1, 0);
-				Vector3 point2 = new(dtofSquared, -1, maxHeight);
+					foreach(var mass2 in ion2Masses)
+					{
+						if(!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
+						{
+							addedLinesSet.Add((mass1, mass2));
+							addedLinesSet.Add((mass2, mass1));
 
-				Vector3[] arr = new Vector3[2];
-				arr[0] = point1;
-				arr[1] = point2;
-				lines.Add(arr);
+							float dtof = (float)Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
+							var dtofSquared = dtof * dtof;
+							Vector3 point1 = new(dtofSquared, -1, 0);
+							Vector3 point2 = new(dtofSquared, -1, maxHeight);
+
+							Vector3[] arr = new Vector3[2];
+							arr[0] = point1;
+							arr[1] = point2;
+							lines.Add(arr);
+						}
+					}
+				}
 			}
 		}
 
 		return lines;
 	}
+
+
 
 	public static ReadOnlyMemory2D<float> BuildSqrtChart(List<Vector2> points, int origSideLength, float origResolution, out float newResolution, out float newPhysicalSideLength)
 	{
@@ -422,4 +436,15 @@ public static class SaxeyAddons
 				histogramArray[i] = (float)Math.Log10(1 + histogramArray[i]);
 		}
 	}
+
+}
+
+public struct LinesOptions
+{
+	public List<string> selectedSymbols;
+	//public List<IonFormula> selectedIons;
+	public List<int> selectedCharges;
+	public Dictionary<string, IElement> elements;
+	public IIonFormulaIsotopeCalculator calculator;
+	public IonFormulaIsotopeOptions calculatorOptions;
 }

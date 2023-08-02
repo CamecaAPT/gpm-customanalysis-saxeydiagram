@@ -1,6 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Windows.Documents;
 using System.Xml.Serialization;
+using Cameca.CustomAnalysis.Interface;
 using Prism.Mvvm;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
@@ -94,27 +97,19 @@ public class SaxeyDiagramOptions : BindableBase
 	[Display(Name = "Where to show lines", Description = "Which graphs to render lines onto.")]
 	public LineSelections LineSelections { get; set; } = new LineSelections();
 
-	//private float atom1mc;
-	//[Display(Name = "Atom 1 m/c")]
-	//public float Atom1mc
-	//{
-	//	get => atom1mc;
-	//	set => SetProperty(ref atom1mc, value);
-	//}
-
-	//private float atom2mc;
-	//[Display(Name = "Atom 2 m/c")]
-	//public float Atom2mc
-	//{
-	//	get => atom2mc;
-	//	set => SetProperty (ref atom2mc, value);
-	//}
-
 	private ObservableCollection<string> ionSelections = new();
 	[Display(AutoGenerateField = false)]
 	public ObservableCollection<string> IonSelections
 	{
 		get => ionSelections;
 		set => SetProperty(ref ionSelections, value);
+	}
+
+	private List<int> chargeCounts = new();
+	[Display(AutoGenerateField = false)]
+	public List<int> ChargeCounts
+	{ 
+		get => chargeCounts;
+		set => SetProperty(ref chargeCounts, value);
 	}
 }
