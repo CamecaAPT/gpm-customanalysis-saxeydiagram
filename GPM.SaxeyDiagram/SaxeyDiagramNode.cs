@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -28,12 +29,14 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 	private readonly IElementDataSetService _elementDataSetService;
 	private readonly INodeElementDataSetProvider _nodeElementDataSetProvider;
 	private readonly IIonFormulaIsotopeCalculator _ionFormulaIsotopeCalculator;
+	public Dictionary<string, IElement> Elements { get; private set; }
 
 	public SaxeyDiagramNode(IAnalysisNodeBaseServices services, IElementDataSetService elementDataSetService, INodeElementDataSetProvider nodeElementDataSetProvider, IIonFormulaIsotopeCalculator ionFormulaIsotopeCalculator) : base(services)
 	{
 		_elementDataSetService = elementDataSetService;
 		_nodeElementDataSetProvider = nodeElementDataSetProvider;
 		_ionFormulaIsotopeCalculator = ionFormulaIsotopeCalculator;
+		Elements = new();
 	}
 
 	public SaxeyDiagramOptions Options { get; private set; } = new();
@@ -75,8 +78,8 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 		toRet.Add(multisChart);
 		toRet.Add(maxHeight);
 
-		var rangeTable = SaxeyAddons.BuildRangeTable(IonLineAndChartSelection);
-		toRet.Add(rangeTable);
+		//var rangeTable = SaxeyAddons.BuildRangeTable(IonLineAndChartSelection, Elements);
+		//toRet.Add(rangeTable);
 
 		var nodeElementDataset = _nodeElementDataSetProvider.Resolve(Services.IdProvider.Get(this));
 		var elementDataset = _elementDataSetService.GetElementDataSet(nodeElementDataset!.ElementDataSetId);
@@ -122,6 +125,13 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
             	Options = loadedOptions;
             }
 		}
+
+		//Create the element dictionary for easy lookup
+		var nodeElementDataset = _nodeElementDataSetProvider.Resolve(Services.IdProvider.Get(this));
+		var elementDataset = _elementDataSetService.GetElementDataSet(nodeElementDataset!.ElementDataSetId)!;
+		Elements = new();
+		foreach (var element in elementDataset.Elements)
+			Elements.Add(element.Symbol, element);
 	}
 
 	private void OptionsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)

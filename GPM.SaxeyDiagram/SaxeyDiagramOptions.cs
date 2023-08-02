@@ -1,6 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Windows.Documents;
 using System.Xml.Serialization;
+using Cameca.CustomAnalysis.Interface;
 using Prism.Mvvm;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
@@ -117,4 +120,20 @@ public class SaxeyDiagramOptions : BindableBase
 		get => ionSelections;
 		set => SetProperty(ref ionSelections, value);
 	}
+
+	private List<int> chargeCounts = new();
+	[Display(AutoGenerateField = false)]
+	public List<int> ChargeCounts
+	{ 
+		get => chargeCounts;
+		set => SetProperty(ref chargeCounts, value);
+	}
+
+	//private List<IonFormula> ionFormulas = new();
+	//[Display(AutoGenerateField = false)]
+	//public List<IonFormula> IonFormulas
+	//{
+	//	get => ionFormulas;
+	//	set => SetProperty(ref ionFormulas, value);
+	//}
 }
