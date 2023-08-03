@@ -81,9 +81,14 @@
                                HorizontalAlignment="Left"
                                TextWrapping="WrapWithOverflow" />
                 </DataTemplate>
+                <local:RangeTableView x:Key="rangeTableView">
+                    
+                </local:RangeTableView>
+                <!--
                 <DataTemplate DataType="{x:Type local:RangeTableViewModel}">
                     <DataGrid ItemsSource="{Binding RangeTable}" HeadersVisibility="None"/>
                 </DataTemplate>
+                -->
                 <DataTemplate DataType="{x:Type local:Histogram2DHistogram1DSideBySideViewModel}">
                     <Grid>
                         <Grid.ColumnDefinitions>
