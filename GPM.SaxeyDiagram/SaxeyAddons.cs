@@ -223,52 +223,46 @@ public static class SaxeyAddons
 	{
 		List<Vector3[]> lines = new();
 
-		//var selectedSymbols = linesOptions.selectedSymbols;
-		//var selectedCharges = linesOptions.selectedCharges;
-		//var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
+		var selectedSymbols = linesOptions.selectedSymbols;
+		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
 
-		////y = ( sqrt(x) + (m2/c2 - m1/c1) )^2
+		//y = ( sqrt(x) + (m2/c2 - m1/c1) )^2
 
-		////this is essentially the resolution of the line
-		//const float deltaX = .1f;
+		//this is essentially the resolution of the line
+		const float deltaX = .1f;
 
-		//HashSet<(float, float)> addedLinesSet = new();
-		//for (int i = 0; i < selectedSymbols.Count; i++)
-		//{
-		//	var ion1Sym = selectedSymbols[i];
-		//	var ion1Charge = selectedCharges[i];
-		//	var ion1Masses = symbolToMassDict[ion1Sym];
+		HashSet<(float, float)> addedLinesSet = new();
+		for (int i = 0; i < selectedSymbols.Count; i++)
+		{
+			var ion1Sym = selectedSymbols[i].Item1;
+			var ion1Masses = symbolToMassDict.Item1[ion1Sym];
 
-		//	foreach(var mass1 in ion1Masses)
-		//	{
-		//		for (int j = i + 1; j < selectedSymbols.Count; j++)
-		//		{
-		//			var ion2Sym = selectedSymbols[j];
-		//			var ion2Charge = selectedCharges[j];
-		//			var ion2Masses = symbolToMassDict[ion2Sym];
+			var ion2Sym = selectedSymbols[i].Item2;
+			var ion2Masses = symbolToMassDict.Item2[ion2Sym];
 
-		//			foreach(var mass2 in ion2Masses)
-		//			{
-		//				if(!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
-		//				{
-		//					List<Vector3> line = new();
-		//					float xVal = 0f;
-		//					float yVal = 0f;
-		//					var dtof = Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
-		//					addedLinesSet.Add((mass1, mass2));
-		//					addedLinesSet.Add((mass2, mass1));
-		//					do
-		//					{
-		//						yVal = (float)Math.Pow(Math.Sqrt(xVal) + dtof, 2);
-		//						line.Add(new Vector3(xVal, -1, yVal));
-		//						xVal += deltaX;
-		//					} while (yVal <= maxHeight && xVal <= maxHeight);
-		//					lines.Add(line.ToArray());
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
+			foreach(var mass1 in ion1Masses)
+			{
+				foreach(var mass2 in ion2Masses)
+				{
+					if (!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
+					{
+						List<Vector3> line = new();
+						float xVal = 0f;
+						float yVal = 0f;
+						var dtof = Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
+						addedLinesSet.Add((mass1, mass2));
+						addedLinesSet.Add((mass2, mass1));
+						do
+						{
+							yVal = (float)Math.Pow(Math.Sqrt(xVal) + dtof, 2);
+							line.Add(new Vector3(xVal, -1, yVal));
+							xVal += deltaX;
+						} while (yVal <= maxHeight && xVal <= maxHeight);
+						lines.Add(line.ToArray());
+					}
+				}
+			}
+		}
 
 		return lines;
 	}
@@ -276,44 +270,41 @@ public static class SaxeyAddons
 	public static List<Vector3[]> GetLines2D(LinesOptions linesOptions, float height)
 	{
 		List<Vector3[]> lines = new();
-		//float h = (float)Math.Sqrt(height);
+		float h = (float)Math.Sqrt(height);
 
-		//var selectedSymbols = linesOptions.selectedSymbols;
-		//var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
+		var selectedSymbols = linesOptions.selectedSymbols;
+		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
 
-		//HashSet<(float, float)> addedLinesSet = new();
-		//for (int i = 0; i < selectedSymbols.Count; i++)
-		//{
-		//	var ion1 = selectedSymbols[i];
-		//	var ion1Masses = symbolToMassDict[ion1];
+		HashSet<(float, float)> addedLinesSet = new();
+		for (int i = 0; i < selectedSymbols.Count; i++)
+		{
+			var ion1 = selectedSymbols[i].Item1;
+			var ion1Masses = symbolToMassDict.Item1[ion1];
 
-		//	foreach(var mass1 in ion1Masses)
-		//	{
-		//		for (int j = i + 1; j < selectedSymbols.Count; j++)
-		//		{
-		//			var ion2 = selectedSymbols[j];
-		//			var ion2Masses = symbolToMassDict[ion2];
+			var ion2 = selectedSymbols[i].Item2;
+			var ion2Masses = symbolToMassDict.Item2[ion2];
 
-		//			foreach(var mass2 in ion2Masses)
-		//			{
-		//				if(!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
-		//				{
-		//					addedLinesSet.Add((mass1, mass2));
-		//					addedLinesSet.Add((mass2, mass1));
+			foreach(var mass1 in ion1Masses)
+			{
+				foreach(var mass2 in ion2Masses)
+				{
+					if (!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
+					{
+						addedLinesSet.Add((mass1, mass2));
+						addedLinesSet.Add((mass2, mass1));
 
-		//					float dtof = (float)Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
-		//					Vector3 point1 = new Vector3(0, -1, dtof);
-		//					Vector3 point2 = new Vector3(h - dtof, -1, h);
+						float dtof = (float)Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
+						Vector3 point1 = new Vector3(0, -1, dtof);
+						Vector3 point2 = new Vector3(h - dtof, -1, h);
 
-		//					Vector3[] arr = new Vector3[2];
-		//					arr[0] = point1;
-		//					arr[1] = point2;
-		//					lines.Add(arr);
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
+						Vector3[] arr = new Vector3[2];
+						arr[0] = point1;
+						arr[1] = point2;
+						lines.Add(arr);
+					}
+				}
+			}
+		}
 
 
 		return lines;
@@ -323,44 +314,41 @@ public static class SaxeyAddons
 	{
 		List<Vector3[]> lines = new();
 
-		//var selectedSymbols = linesOptions.selectedSymbols;
-		//var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
+		var selectedSymbols = linesOptions.selectedSymbols;
+		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
 
-		//HashSet<(float, float)> addedLinesSet = new();
+		HashSet<(float, float)> addedLinesSet = new();
 
-		//for (int i = 0; i < selectedSymbols.Count; i++)
-		//{
-		//	var ion1 = selectedSymbols[i];
-		//	var ion1Masses = symbolToMassDict[ion1];
+		for (int i = 0; i < selectedSymbols.Count; i++)
+		{
+			var ion1 = selectedSymbols[i].Item1;
+			var ion1Masses = symbolToMassDict.Item1[ion1];
 
-		//	foreach(var mass1 in ion1Masses)
-		//	{
-		//		for (int j = i + 1; j < selectedSymbols.Count; j++)
-		//		{
-		//			var ion2 = selectedSymbols[j];
-		//			var ion2Masses = symbolToMassDict[ion2];
+			var ion2 = selectedSymbols[i].Item2;
+			var ion2Masses = symbolToMassDict.Item2[ion2];
 
-		//			foreach(var mass2 in ion2Masses)
-		//			{
-		//				if(!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
-		//				{
-		//					addedLinesSet.Add((mass1, mass2));
-		//					addedLinesSet.Add((mass2, mass1));
+			foreach(var mass1 in ion1Masses)
+			{
+				foreach(var mass2 in ion2Masses)
+				{
+					if (!addedLinesSet.Contains((mass1, mass2)) && !addedLinesSet.Contains((mass2, mass1)))
+					{
+						addedLinesSet.Add((mass1, mass2));
+						addedLinesSet.Add((mass2, mass1));
 
-		//					float dtof = (float)Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
-		//					var dtofSquared = dtof * dtof;
-		//					Vector3 point1 = new(dtofSquared, -1, 0);
-		//					Vector3 point2 = new(dtofSquared, -1, maxHeight);
+						float dtof = (float)Math.Abs(Math.Sqrt(mass1) - Math.Sqrt(mass2));
+						var dtofSquared = dtof * dtof;
+						Vector3 point1 = new(dtofSquared, -1, 0);
+						Vector3 point2 = new(dtofSquared, -1, maxHeight);
 
-		//					Vector3[] arr = new Vector3[2];
-		//					arr[0] = point1;
-		//					arr[1] = point2;
-		//					lines.Add(arr);
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
+						Vector3[] arr = new Vector3[2];
+						arr[0] = point1;
+						arr[1] = point2;
+						lines.Add(arr);
+					}
+				}
+			}
+		}
 
 		return lines;
 	}
@@ -407,8 +395,6 @@ public static class SaxeyAddons
 		int[] histogramData = new int[boxes];
 
 		List<Vector2> histogramList = new();
-
-		SortedDictionary<int, int> map = new();
 
 		foreach(var point in points)
 		{ 

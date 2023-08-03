@@ -116,13 +116,13 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			if(ionFormula1 != null && ionFormula2 != null)
 			{
 				string ionToAdd1;
-				if (!IonName1.Value.Contains("+"))
+				if (!IonName1.Value.Contains('+'))
 					ionToAdd1 = IonName1.Value + "+";
 				else
 					ionToAdd1 = IonName1.Value;
 
 				string ionToAdd2;
-				if (!IonName2.Value.Contains("+"))
+				if (!IonName2.Value.Contains('+'))
 					ionToAdd2 = IonName2.Value + "+";
 				else
 					ionToAdd2 = IonName2.Value;
@@ -193,7 +193,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 		var calculator = (IIonFormulaIsotopeCalculator)data[6];
 
-		LinesOptions linesOptions = new LinesOptions()
+		LinesOptions linesOptions = new()
 		{
 			elements = Node.Elements,
 			calculator = calculator,
