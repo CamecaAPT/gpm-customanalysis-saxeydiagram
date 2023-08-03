@@ -97,17 +97,17 @@ public class SaxeyDiagramOptions : BindableBase
 	[Display(Name = "Where to show lines", Description = "Which graphs to render lines onto.")]
 	public LineSelections LineSelections { get; set; } = new LineSelections();
 
-	private ObservableCollection<string> ionSelections = new();
+	private ObservableCollection<(string, string)> ionSelections = new();
 	[Display(AutoGenerateField = false)]
-	public ObservableCollection<string> IonSelections
+	public ObservableCollection<(string, string)> IonSelections
 	{
 		get => ionSelections;
 		set => SetProperty(ref ionSelections, value);
 	}
 
-	private List<int> chargeCounts = new();
+	private List<(int, int)> chargeCounts = new();
 	[Display(AutoGenerateField = false)]
-	public List<int> ChargeCounts
+	public List<(int, int)> ChargeCounts
 	{ 
 		get => chargeCounts;
 		set => SetProperty(ref chargeCounts, value);

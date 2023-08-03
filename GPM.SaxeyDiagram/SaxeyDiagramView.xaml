@@ -45,9 +45,17 @@
                                    ExpandButtonsVisibility="Visible"
                                    ExpandCategoriesWhenSelectedObjectChanged="True" />
             <Button Content="Add Ion" Grid.Row="2" Command="{Binding AddLineCommand}" />
-            <Label Grid.Row="3" Content="Ion Name (e.g.H+ or Ga++)"/>
-            <TextBox Grid.Row="4" Text="{Binding IonName.Value}"/>
-            <Button Content="Remove Ions" Grid.Row="5" Command="{Binding RemoveLinesCommand}"/>
+            <Label Grid.Row="3" Content="Ion Names (e.g.GaN3++ or H2)"/>
+            <Grid Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBox Grid.Column="0" Text="{Binding IonName1.Value}"/>
+                <TextBox Grid.Column="1" Text="{Binding IonName2.Value}"/>
+            </Grid>
+                <Button Content="Remove Ions" Grid.Row="5" Command="{Binding RemoveLinesCommand}"/>
             <ListBox Grid.Row="6" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="MouseDoubleClick">

@@ -37,19 +37,21 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	private readonly RelayCommand removeLines;
 	public ICommand RemoveLinesCommand => removeLines;
 
-	public ObservableCollection<string> SelectedIons
+	public ObservableCollection<(string, string)> SelectedIons
 	{
 		get => Options.IonSelections;
 		set => Options.IonSelections = value;
 	}
 
-	public List<int> ChargeCounts 
+	public List<(int, int)> ChargeCounts 
 	{
 		get => Options.ChargeCounts;
 		private set => Options.ChargeCounts = value;
 	}
 
-	public ObservableObject<string> IonName { get; set; } = new();
+	public ObservableObject<string> IonName1 { get; set; } = new();
+
+	public ObservableObject<string> IonName2 { get; set; } = new();
 
 	public string ListBoxSelection { get; set; } = "";
 
@@ -99,27 +101,41 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 	private void OnAddLine()
 	{
-		if(SaxeyAddons.ValidateIonString(IonName.Value, out var match))
+		if(IonName1.Value == null || IonName2.Value == null)
 		{
-			var ionFormula = SaxeyAddons.IonFormulaFromMatch(match, Node.Elements, out var charge);
+			MessageBox.Show("Fill in both ion boxes");
+			return;
+		}
+
+		if(SaxeyAddons.ValidateIonString(IonName1.Value, out var match1) && SaxeyAddons.ValidateIonString(IonName2.Value, out var match2))
+		{
+			var ionFormula1 = SaxeyAddons.IonFormulaFromMatch(match1, Node.Elements, out var charge1);
+			var ionFormula2 = SaxeyAddons.IonFormulaFromMatch(match2, Node.Elements, out var charge2);
 
 			//if the ionFormula given is correct
-			if(ionFormula != null)
+			if(ionFormula1 != null && ionFormula2 != null)
 			{
-				string ionToAdd;
-				if (!IonName.Value.Contains("+"))
-					ionToAdd = IonName.Value + "+";
+				string ionToAdd1;
+				if (!IonName1.Value.Contains('+'))
+					ionToAdd1 = IonName1.Value + "+";
 				else
-					ionToAdd = IonName.Value;
+					ionToAdd1 = IonName1.Value;
 
-				if (SelectedIons.Contains(ionToAdd))
+				string ionToAdd2;
+				if (!IonName2.Value.Contains('+'))
+					ionToAdd2 = IonName2.Value + "+";
+				else
+					ionToAdd2 = IonName2.Value;
+
+				if (SelectedIons.Contains((ionToAdd1, ionToAdd2)) || SelectedIons.Contains((ionToAdd2, ionToAdd1)))
 					MessageBox.Show("Ion Already Added");
 				else
 				{
-					SelectedIons.Add(ionToAdd);
-					ChargeCounts.Add((int)charge!);
+					SelectedIons.Add((ionToAdd1, ionToAdd2));
+					ChargeCounts.Add(((int)charge1!, (int)charge2!));
 					//IonFormulas.Add(ionFormula);
-					IonName.Value = "";
+					IonName1.Value = "";
+					IonName2.Value = "";
 					runCommand.Execute(null);
 				}
 			}
@@ -128,9 +144,10 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 	public void OnListViewDoubleClick()
 	{
-		var index = SelectedIons.IndexOf(ListBoxSelection);
+		var ions = ListBoxSelection.Split(", ");
+		var index = SelectedIons.IndexOf((ions[0][1..], ions[1][..^1]));
 		//if index not found
-		if(index != -1)
+		if (index != -1)
 		{
 			SelectedIons.RemoveAt(index);
 			ChargeCounts.RemoveAt(index);
@@ -157,7 +174,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		// This shouldn't happen but check for safety
         if (Node is null) return;
 
-		Node.IonLineAndChartSelection = SelectedIons.ToList();
+		//Node.IonLineAndChartSelection = SelectedIons.ToList();
 		var data = await Node.Run();
 
 		if (data == null)
@@ -176,7 +193,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 		var calculator = (IIonFormulaIsotopeCalculator)data[6];
 
-		LinesOptions linesOptions = new LinesOptions()
+		LinesOptions linesOptions = new()
 		{
 			elements = Node.Elements,
 			calculator = calculator,
@@ -244,7 +261,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		if (rangeTable.Rows.Count > 0)
 			Tabs.Add(rangeTableViewModel);
 		else
-			Tabs.Add(new TextContentViewModel("Range Table", "Select at least one ion for the range table to be populated"));
+			Tabs.Add(new TextContentViewModel("Range Table", "Select at least one ion pair for the range table to be populated"));
 
 		SelectedTab = histogram2DViewModel;
 	}
