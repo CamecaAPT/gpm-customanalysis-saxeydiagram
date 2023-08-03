@@ -261,7 +261,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		if (rangeTable.Rows.Count > 0)
 			Tabs.Add(rangeTableViewModel);
 		else
-			Tabs.Add(new TextContentViewModel("Range Table", "Select at least one ion for the range table to be populated"));
+			Tabs.Add(new TextContentViewModel("Range Table", "Select at least one ion pair for the range table to be populated"));
 
 		SelectedTab = histogram2DViewModel;
 	}
