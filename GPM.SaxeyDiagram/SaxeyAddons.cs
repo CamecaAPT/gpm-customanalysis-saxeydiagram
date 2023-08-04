@@ -74,75 +74,70 @@ public static class SaxeyAddons
 		return true;
 	}
 
-	public static (Dictionary<string, List<float>>, Dictionary<string, List<float>>) MakeSymbolToMassDict(LinesOptions linesOptions)
+	public static Dictionary<string, List<float>> MakeSymbolToMassDict(LinesOptions linesOptions, List<string> symbols, List<int> charges)
 	{
-		var selectedSymbols = linesOptions.selectedSymbols;
-		var selectedCharges = linesOptions.selectedCharges;
 		var elements = linesOptions.elements;
 		var calculator = linesOptions.calculator;
 		var calculatorOptions = linesOptions.calculatorOptions;
 
 		//TODO: clean this up perhaps
-		List<IonFormula> selectedIons1 = new();
-		List<IonFormula> selectedIons2 = new();
-		foreach (var symbol in selectedSymbols)
+		List<IonFormula> selectedIons = new();
+		foreach (var symbol in symbols)
 		{
-			ValidateIonString(symbol.Item1, out var match1);
-			ValidateIonString(symbol.Item2, out var match2);
-			selectedIons1.Add(IonFormulaFromMatch(match1, elements, out var _)!);
-			selectedIons2.Add(IonFormulaFromMatch(match2, elements, out var _)!);
+			ValidateIonString(symbol, out var match);
+			selectedIons.Add(IonFormulaFromMatch(match, elements, out var _)!);
 		}
 
-		Dictionary<string, List<float>> symbolToMassDict1 = new();
-		Dictionary<string, List<float>> symbolToMassDict2 = new();
+		Dictionary<string, List<float>> symbolToMassDict = new();
 
-		for (int i = 0; i < selectedIons1.Count; i++)
+		for (int i = 0; i < selectedIons.Count; i++)
 		{
 			//1
-			var sym1 = selectedSymbols[i].Item1;
-			var formula1 = selectedIons1[i];
-			var charge1 = selectedCharges[i].Item1;
-			if (!symbolToMassDict1.ContainsKey(sym1))
-				symbolToMassDict1.Add(sym1, new());
+			var sym = symbols[i];
+			var formula = selectedIons[i];
+			var charge = charges[i];
+			if (!symbolToMassDict.ContainsKey(sym))
+				symbolToMassDict.Add(sym, new());
 
-			var isotopes1 = calculator.GetIsotopes(formula1, calculatorOptions);
+			var isotopes1 = calculator.GetIsotopes(formula, calculatorOptions);
 
 			foreach (var isotope in isotopes1)
-				symbolToMassDict1[sym1].Add((float)isotope.Mass / charge1);
-
-			//2
-			var sym2 = selectedSymbols[i].Item2;
-			var formula2 = selectedIons2[i];
-			var charge2 = selectedCharges[i].Item2;
-			if(!symbolToMassDict2.ContainsKey(sym2))
-				symbolToMassDict2.Add(sym2, new());
-
-			var isotopes2 = calculator.GetIsotopes(formula2, calculatorOptions);
-
-			foreach (var isotope in isotopes2)
-				symbolToMassDict2[sym2].Add((float)isotope.Mass / charge2);
+				symbolToMassDict[sym].Add((float)isotope.Mass / charge);
 		}
 
-		return (symbolToMassDict1, symbolToMassDict2);
+		return symbolToMassDict;
 	}
 
-	public static DataTable BuildRangeTable(LinesOptions linesOptions)
+	public static DataTable BuildRangeTable(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges)
 	{
 		/*
 		 * For now, Item1 will be on the side and item2 on top
 		 */
 
 		DataTable rangeTable = new();
-		var selectedSymbols = linesOptions.selectedSymbols;
 
 		if (selectedSymbols.Count == 0) return rangeTable;
 
-		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
+		List<string> selectedSymbols1 = new();
+		List<string> selectedSymbols2 = new();
+		List<int> selectedCharges1 = new();
+		List<int> selectedCharges2 = new();
+		for(int i=0; i<selectedSymbols.Count; i++)
+		{
+			selectedSymbols1.Add(selectedSymbols[i].Item1);
+			selectedSymbols2.Add(selectedSymbols[i].Item2);
+
+			selectedCharges1.Add(selectedCharges[i].Item1);
+			selectedCharges2.Add(selectedCharges[i].Item2);
+		}
+
+		var symbolToMassDict1 = MakeSymbolToMassDict(linesOptions, selectedSymbols1, selectedCharges1);
+		var symbolToMassDict2 = MakeSymbolToMassDict(linesOptions, selectedSymbols2, selectedCharges2);
 
 		//Add Columns
 		rangeTable.Columns.Add();
 		rangeTable.Columns.Add();
-		foreach (var symbolMassesPair in symbolToMassDict.Item2)
+		foreach (var symbolMassesPair in symbolToMassDict2)
 		{
 			foreach(var _ in symbolMassesPair.Value)
 				rangeTable.Columns.Add();
@@ -150,7 +145,7 @@ public static class SaxeyAddons
 
 		//add what we want for column headers
 		List<object> row = new() { "", "" };
-		foreach (var symbolMassesPair in symbolToMassDict.Item2)
+		foreach (var symbolMassesPair in symbolToMassDict2)
 		{
 			foreach(var _ in symbolMassesPair.Value)
 				row.Add(symbolMassesPair.Key);
@@ -159,56 +154,47 @@ public static class SaxeyAddons
 
 		//add secondary column information (ion weight)
 		row = new() { "", "" };
-		foreach (var symbolMassesPair in symbolToMassDict.Item2)
+		foreach (var symbolMassesPair in symbolToMassDict2)
 		{
 			foreach(var mass in symbolMassesPair.Value)
 				row.Add(mass.ToString("f2"));
 		}
 		rangeTable.Rows.Add(row.ToArray());
 
-		HashSet<(float, float)> addedToTableSet = new();
-		var keys1 = symbolToMassDict.Item1.Keys.ToList();
-		var keys2 = symbolToMassDict.Item2.Keys.ToList();
+		//HashSet<(float, float)> addedToTableSet = new();
+		var keys1 = symbolToMassDict1.Keys.ToList();
+		var keys2 = symbolToMassDict2.Keys.ToList();
 		int rowCount = 0;
 		for (int i = 0; i < keys1.Count; i++)
 		{
 			var ion1Formula = keys1[i];
-			var ion1Masses = symbolToMassDict.Item1[ion1Formula];
+			var ion1Masses = symbolToMassDict1[ion1Formula];
 
 			foreach(var mass1 in ion1Masses)
 			{
 				row = new() { ion1Formula, mass1.ToString("f2") };
 
-				//add spaces
-				//for (int k = 0; k < rowCount; k++)
-				//	row.Add("");
-
 				for (int j = 0; j < keys2.Count; j++)
 				{
 					var ion2Formula = keys2[j];
-					var ion2Masses = symbolToMassDict.Item2[ion2Formula];
+					var ion2Masses = symbolToMassDict2[ion2Formula];
 
 					foreach(var mass2 in ion2Masses)
 					{
 						var dtofSquared = Math.Pow(Math.Sqrt(mass1) - Math.Sqrt(mass2), 2);
-						//string toAdd;
-						//if (dtofSquared == 0)
-						//	toAdd = "";
+
+						//if(dtofSquared == 0)
+						//	row.Add(dtofSquared.ToString("f2"));
+						//else if (!addedToTableSet.Contains((mass1, mass2)) && !addedToTableSet.Contains((mass2, mass1)))
+						//{
+						//	row.Add(dtofSquared.ToString("f2"));
+						//	addedToTableSet.Add((mass1, mass2));
+						//	addedToTableSet.Add((mass2, mass1));
+						//}
 						//else
-						//	toAdd = dtofSquared.ToString("f2");
+						//	row.Add("");
 
-						if(dtofSquared == 0)
-							row.Add(dtofSquared.ToString("f2"));
-						else if (!addedToTableSet.Contains((mass1, mass2)) && !addedToTableSet.Contains((mass2, mass1)))
-						{
-							row.Add(dtofSquared.ToString("f2"));
-							addedToTableSet.Add((mass1, mass2));
-							addedToTableSet.Add((mass2, mass1));
-						}
-						else
-							row.Add("");
-
-						
+						row.Add(dtofSquared.ToString("f2"));
 					}
 				}
 				rangeTable.Rows.Add(row.ToArray());
@@ -219,12 +205,25 @@ public static class SaxeyAddons
 		return rangeTable;
 	}
 
-	public static List<Vector3[]> GetLinesSaxey(LinesOptions linesOptions, float maxHeight)
+	public static List<Vector3[]> GetLinesSaxey(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, float maxHeight)
 	{
 		List<Vector3[]> lines = new();
 
-		var selectedSymbols = linesOptions.selectedSymbols;
-		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
+		List<string> selectedSymbols1 = new();
+		List<string> selectedSymbols2 = new();
+		List<int> selectedCharges1 = new();
+		List<int> selectedCharges2 = new();
+		for (int i = 0; i < selectedSymbols.Count; i++)
+		{
+			selectedSymbols1.Add(selectedSymbols[i].Item1);
+			selectedSymbols2.Add(selectedSymbols[i].Item2);
+
+			selectedCharges1.Add(selectedCharges[i].Item1);
+			selectedCharges2.Add(selectedCharges[i].Item2);
+		}
+
+		var symbolToMassDict1 = MakeSymbolToMassDict(linesOptions, selectedSymbols1, selectedCharges1);
+		var symbolToMassDict2 = MakeSymbolToMassDict(linesOptions, selectedSymbols2, selectedCharges2);
 
 		//y = ( sqrt(x) + (m2/c2 - m1/c1) )^2
 
@@ -234,11 +233,11 @@ public static class SaxeyAddons
 		HashSet<(float, float)> addedLinesSet = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
-			var ion1Sym = selectedSymbols[i].Item1;
-			var ion1Masses = symbolToMassDict.Item1[ion1Sym];
+			var ion1Sym = selectedSymbols1[i];
+			var ion1Masses = symbolToMassDict1[ion1Sym];
 
-			var ion2Sym = selectedSymbols[i].Item2;
-			var ion2Masses = symbolToMassDict.Item2[ion2Sym];
+			var ion2Sym = selectedSymbols2[i];
+			var ion2Masses = symbolToMassDict2[ion2Sym];
 
 			foreach(var mass1 in ion1Masses)
 			{
@@ -267,22 +266,35 @@ public static class SaxeyAddons
 		return lines;
 	}
 
-	public static List<Vector3[]> GetLines2D(LinesOptions linesOptions, float height)
+	public static List<Vector3[]> GetLines2D(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, float height)
 	{
 		List<Vector3[]> lines = new();
 		float h = (float)Math.Sqrt(height);
 
-		var selectedSymbols = linesOptions.selectedSymbols;
-		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
+		List<string> selectedSymbols1 = new();
+		List<string> selectedSymbols2 = new();
+		List<int> selectedCharges1 = new();
+		List<int> selectedCharges2 = new();
+		for (int i = 0; i < selectedSymbols.Count; i++)
+		{
+			selectedSymbols1.Add(selectedSymbols[i].Item1);
+			selectedSymbols2.Add(selectedSymbols[i].Item2);
+
+			selectedCharges1.Add(selectedCharges[i].Item1);
+			selectedCharges2.Add(selectedCharges[i].Item2);
+		}
+
+		var symbolToMassDict1 = MakeSymbolToMassDict(linesOptions, selectedSymbols1, selectedCharges1);
+		var symbolToMassDict2 = MakeSymbolToMassDict(linesOptions, selectedSymbols2 ,selectedCharges2);
 
 		HashSet<(float, float)> addedLinesSet = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
-			var ion1 = selectedSymbols[i].Item1;
-			var ion1Masses = symbolToMassDict.Item1[ion1];
+			var ion1 = selectedSymbols1[i];
+			var ion1Masses = symbolToMassDict1[ion1];
 
-			var ion2 = selectedSymbols[i].Item2;
-			var ion2Masses = symbolToMassDict.Item2[ion2];
+			var ion2 = selectedSymbols2[i];
+			var ion2Masses = symbolToMassDict2[ion2];
 
 			foreach(var mass1 in ion1Masses)
 			{
@@ -310,22 +322,35 @@ public static class SaxeyAddons
 		return lines;
 	}
 
-	public static List<Vector3[]> GetLines1D(LinesOptions linesOptions, int maxHeight)
+	public static List<Vector3[]> GetLines1D(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, int maxHeight)
 	{
 		List<Vector3[]> lines = new();
 
-		var selectedSymbols = linesOptions.selectedSymbols;
-		var symbolToMassDict = MakeSymbolToMassDict(linesOptions);
+		List<string> selectedSymbols1 = new();
+		List<string> selectedSymbols2 = new();
+		List<int> selectedCharges1 = new();
+		List<int> selectedCharges2 = new();
+		for (int i = 0; i < selectedSymbols.Count; i++)
+		{
+			selectedSymbols1.Add(selectedSymbols[i].Item1);
+			selectedSymbols2.Add(selectedSymbols[i].Item2);
+
+			selectedCharges1.Add(selectedCharges[i].Item1);
+			selectedCharges2.Add(selectedCharges[i].Item2);
+		}
+
+		var symbolToMassDict1 = MakeSymbolToMassDict(linesOptions, selectedSymbols1, selectedCharges1);
+		var symbolToMassDict2 = MakeSymbolToMassDict(linesOptions, selectedSymbols2 ,selectedCharges2);
 
 		HashSet<(float, float)> addedLinesSet = new();
 
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
-			var ion1 = selectedSymbols[i].Item1;
-			var ion1Masses = symbolToMassDict.Item1[ion1];
+			var ion1 = selectedSymbols1[i];
+			var ion1Masses = symbolToMassDict1[ion1];
 
-			var ion2 = selectedSymbols[i].Item2;
-			var ion2Masses = symbolToMassDict.Item2[ion2];
+			var ion2 = selectedSymbols2[i];
+			var ion2Masses = symbolToMassDict2[ion2];
 
 			foreach(var mass1 in ion1Masses)
 			{
@@ -449,9 +474,8 @@ public static class SaxeyAddons
 
 public struct LinesOptions
 {
-	public List<(string, string)> selectedSymbols;
-	//public List<IonFormula> selectedIons;
-	public List<(int, int)> selectedCharges;
+	//public List<(string, string)> selectedSymbols;
+	//public List<(int, int)> selectedCharges;
 	public Dictionary<string, IElement> elements;
 	public IIonFormulaIsotopeCalculator calculator;
 	public IonFormulaIsotopeOptions calculatorOptions;

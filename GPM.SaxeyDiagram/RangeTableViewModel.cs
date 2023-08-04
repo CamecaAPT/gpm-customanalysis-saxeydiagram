@@ -14,7 +14,7 @@ namespace GPM.CustomAnalysis.SaxeyDiagram;
 
 internal class RangeTableViewModel : IDisposable
 {
-	//public string Title { get; }
+	public string Title { get; }
 
 	public DataTable RangeTable { get; set; }
 
@@ -37,15 +37,16 @@ internal class RangeTableViewModel : IDisposable
 	public ICommand RemoveAllX => removeAllX;
 	public ICommand RemoveAllY => removeAllY;
 
-	public RangeTableViewModel(DataTable rangeTable)
+	public RangeTableViewModel(DataTable rangeTable, string title)
 	{
 		//RangeTable = rangeTable;
-		//Title = title;
+		Title = title;
 		enterPressedX = new(AddIonX);
 		enterPressedY = new(AddIonY);
 		removeAllX = new(ClearX);
 		removeAllY = new(ClearY);
 		RangeTable = rangeTable;
+		Title = title;
 	}
 
 	public void Dispose()

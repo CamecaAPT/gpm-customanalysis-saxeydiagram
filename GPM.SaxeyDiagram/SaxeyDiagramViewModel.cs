@@ -197,15 +197,13 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		{
 			elements = Node.Elements,
 			calculator = calculator,
-			selectedCharges = ChargeCounts,
-			selectedSymbols = SelectedIons.ToList(),
 			calculatorOptions = new IonFormulaIsotopeOptions() { MinimumIsotopeAbundance = .01 }
 		};
 
 		List<ILineRenderData> saxeyLines = new();
 		if (Options.LineSelections.SaxeyDiagram)
 		{
-			List<Vector3[]> lineSaxeyPoints = SaxeyAddons.GetLinesSaxey(linesOptions, Options.MassExtent);
+			List<Vector3[]> lineSaxeyPoints = SaxeyAddons.GetLinesSaxey(linesOptions, SelectedIons.ToList(), ChargeCounts, Options.MassExtent);
 			foreach (var line in lineSaxeyPoints)
 				saxeyLines.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
 		}
@@ -237,7 +235,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		List<ILineRenderData> lines2D = new();
 		if (Options.LineSelections.LinearizedDiagram)
 		{
-			List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(linesOptions, Options.MassExtent);
+			List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(linesOptions, SelectedIons.ToList(), ChargeCounts, Options.MassExtent);
 			foreach (var line in line2DPoints)
 				lines2D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
 		}
@@ -246,7 +244,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		if (Options.LineSelections.CalculatedMassSpectrum)
 		{
 			int maxHeight = (int)data[4];
-			List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(linesOptions, maxHeight);
+			List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(linesOptions, SelectedIons.ToList(), ChargeCounts, maxHeight);
 			foreach (var line in line1DPoints)
 				lines1D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
 		}
@@ -256,14 +254,12 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			sqrtRenderData, multisRenderData, lines2D, lines1D);
 		Tabs.Add(saxeyAddonsViewModel);
 
-		DataTable rangeTable = SaxeyAddons.BuildRangeTable(linesOptions);
-		//var rangeTableViewModel = new RangeTableViewModel("Range Table", rangeTable);
-		//if (rangeTable.Rows.Count > 0)
-		//	Tabs.Add(rangeTableViewModel);
-		//else
-		//	Tabs.Add(new TextContentViewModel("Range Table", "Select at least one ion pair for the range table to be populated"));
-		var rangeTableView = new RangeTableView("Range Table", rangeTable);
-		Tabs.Add(rangeTableView);
+		DataTable rangeTable = SaxeyAddons.BuildRangeTable(linesOptions, SelectedIons.ToList(), ChargeCounts);
+		var rangeTableViewModel = new RangeTableView("Range Table", rangeTable);
+		if (rangeTable.Rows.Count > 0)
+			Tabs.Add(rangeTableViewModel);
+		else
+			Tabs.Add(new TextContentViewModel("Range Table", "Select at least one ion pair for the range table to be populated"));
 
 		SelectedTab = histogram2DViewModel;
 	}

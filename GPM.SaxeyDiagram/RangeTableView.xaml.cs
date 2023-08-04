@@ -26,7 +26,7 @@ public partial class RangeTableView : UserControl
 	{
 		InitializeComponent();
 		Title = title;
-		DataContext = new RangeTableViewModel(dataTable);
+		DataContext = new RangeTableViewModel(dataTable, title);
 	}
 
 	private void ListBox_MouseDoubleClickX(object sender, MouseButtonEventArgs e)
