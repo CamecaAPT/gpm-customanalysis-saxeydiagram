@@ -16,8 +16,11 @@ Ions with multiple commonly occuring isotopes will have all of them graphed with
 Additionally, for the multi-hit atom mass spectrum, there is an option specifying the bin size for the histogram.
 
 ## Range Table
-The range table is automatically populated from the Ion Pair selections made for the line graphing. The first ion goes on the Y axis, and the second on the X axis.
+The range table is populated from within the Range Table tab. The user has the option to add ions separately to the X and Y axis of the chart. Double click to remove ions,
+or click Remove All to remove all from that axis at once. 
+When adding ion pairs, you can give the charge state by giving 1-5 '+' signs. If no plus signs are given, a charge state of 1 is assumed.
+Correct capitalization formatting is required to remove ambiquity from differentiating ions (e.g. CO vs Co)
 Ions with multiple commonly occurring isotopes will have all of them listed on their respective axis.
 
 ### Other Notes
-- Lines will not be drawn on the mirrored plot versions of the Saxey Diagram.
+- Lines will not be drawn on the mirrored plot side of the Saxey Diagram.
