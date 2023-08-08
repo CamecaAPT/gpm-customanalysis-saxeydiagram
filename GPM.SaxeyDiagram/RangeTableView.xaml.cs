@@ -20,13 +20,12 @@ namespace GPM.CustomAnalysis.SaxeyDiagram;
 /// </summary>
 public partial class RangeTableView : UserControl
 {
-	public string Title { get; }
+	public string Title { get; } = "Range Table";
 
-	public RangeTableView(string title, DataTable dataTable)
+	public RangeTableView(LinesOptions linesOptions)
 	{
 		InitializeComponent();
-		Title = title;
-		DataContext = new RangeTableViewModel(dataTable, title);
+		DataContext = new RangeTableViewModel(linesOptions);
 	}
 
 	private void ListBox_MouseDoubleClickX(object sender, MouseButtonEventArgs e)

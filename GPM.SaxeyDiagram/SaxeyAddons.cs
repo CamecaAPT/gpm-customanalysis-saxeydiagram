@@ -108,36 +108,22 @@ public static class SaxeyAddons
 		return symbolToMassDict;
 	}
 
-	public static DataTable BuildRangeTable(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges)
+	public static void BuildRangeTable(DataTable rangeTable, LinesOptions linesOptions, List<string> symbolsX, List<string> symbolsY, List<int> chargesX, List<int> chargesY)
 	{
 		/*
 		 * For now, Item1 will be on the side and item2 on top
 		 */
 
-		DataTable rangeTable = new();
+		if (symbolsX.Count == 0 || symbolsY.Count == 0) return;
 
-		if (selectedSymbols.Count == 0) return rangeTable;
 
-		List<string> selectedSymbols1 = new();
-		List<string> selectedSymbols2 = new();
-		List<int> selectedCharges1 = new();
-		List<int> selectedCharges2 = new();
-		for(int i=0; i<selectedSymbols.Count; i++)
-		{
-			selectedSymbols1.Add(selectedSymbols[i].Item1);
-			selectedSymbols2.Add(selectedSymbols[i].Item2);
-
-			selectedCharges1.Add(selectedCharges[i].Item1);
-			selectedCharges2.Add(selectedCharges[i].Item2);
-		}
-
-		var symbolToMassDict1 = MakeSymbolToMassDict(linesOptions, selectedSymbols1, selectedCharges1);
-		var symbolToMassDict2 = MakeSymbolToMassDict(linesOptions, selectedSymbols2, selectedCharges2);
+		var symbolToMassDictX = MakeSymbolToMassDict(linesOptions, symbolsX, chargesX);
+		var symbolToMassDictY = MakeSymbolToMassDict(linesOptions, symbolsY, chargesY);
 
 		//Add Columns
 		rangeTable.Columns.Add();
 		rangeTable.Columns.Add();
-		foreach (var symbolMassesPair in symbolToMassDict2)
+		foreach (var symbolMassesPair in symbolToMassDictX)
 		{
 			foreach(var _ in symbolMassesPair.Value)
 				rangeTable.Columns.Add();
@@ -145,7 +131,7 @@ public static class SaxeyAddons
 
 		//add what we want for column headers
 		List<object> row = new() { "", "" };
-		foreach (var symbolMassesPair in symbolToMassDict2)
+		foreach (var symbolMassesPair in symbolToMassDictX)
 		{
 			foreach(var _ in symbolMassesPair.Value)
 				row.Add(symbolMassesPair.Key);
@@ -154,46 +140,33 @@ public static class SaxeyAddons
 
 		//add secondary column information (ion weight)
 		row = new() { "", "" };
-		foreach (var symbolMassesPair in symbolToMassDict2)
+		foreach (var symbolMassesPair in symbolToMassDictX)
 		{
 			foreach(var mass in symbolMassesPair.Value)
 				row.Add(mass.ToString("f2"));
 		}
 		rangeTable.Rows.Add(row.ToArray());
 
-		//HashSet<(float, float)> addedToTableSet = new();
-		var keys1 = symbolToMassDict1.Keys.ToList();
-		var keys2 = symbolToMassDict2.Keys.ToList();
+		var keysX = symbolToMassDictX.Keys.ToList();
+		var keysY = symbolToMassDictY.Keys.ToList();
 		int rowCount = 0;
-		for (int i = 0; i < keys1.Count; i++)
+		for (int i = 0; i < keysY.Count; i++)
 		{
-			var ion1Formula = keys1[i];
-			var ion1Masses = symbolToMassDict1[ion1Formula];
+			var ion1Formula = keysY[i];
+			var ion1Masses = symbolToMassDictY[ion1Formula];
 
 			foreach(var mass1 in ion1Masses)
 			{
 				row = new() { ion1Formula, mass1.ToString("f2") };
 
-				for (int j = 0; j < keys2.Count; j++)
+				for (int j = 0; j < keysX.Count; j++)
 				{
-					var ion2Formula = keys2[j];
-					var ion2Masses = symbolToMassDict2[ion2Formula];
+					var ion2Formula = keysX[j];
+					var ion2Masses = symbolToMassDictX[ion2Formula];
 
 					foreach(var mass2 in ion2Masses)
 					{
 						var dtofSquared = Math.Pow(Math.Sqrt(mass1) - Math.Sqrt(mass2), 2);
-
-						//if(dtofSquared == 0)
-						//	row.Add(dtofSquared.ToString("f2"));
-						//else if (!addedToTableSet.Contains((mass1, mass2)) && !addedToTableSet.Contains((mass2, mass1)))
-						//{
-						//	row.Add(dtofSquared.ToString("f2"));
-						//	addedToTableSet.Add((mass1, mass2));
-						//	addedToTableSet.Add((mass2, mass1));
-						//}
-						//else
-						//	row.Add("");
-
 						row.Add(dtofSquared.ToString("f2"));
 					}
 				}
@@ -201,8 +174,6 @@ public static class SaxeyAddons
 				rowCount++;
 			}
 		}
-
-		return rangeTable;
 	}
 
 	public static List<Vector3[]> GetLinesSaxey(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, float maxHeight)

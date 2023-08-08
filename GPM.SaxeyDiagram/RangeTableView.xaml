@@ -51,7 +51,7 @@
                 <ListBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding YIons}" SelectedItem="{Binding SelectionY}" MouseDoubleClick="ListBox_MouseDoubleClickY"/>
             </Grid>
         </Grid>
-        
-        <DataGrid Grid.Column="2" ItemsSource="{Binding RangeTable}" HeadersVisibility="None"/>
+
+        <DataGrid Grid.Column="2" ItemsSource="{Binding RangeTable}" AutoGenerateColumns="{Binding AutoGenerateColumns}" HeadersVisibility="None"/>
     </Grid>
 </UserControl>

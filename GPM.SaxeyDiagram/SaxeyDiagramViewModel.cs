@@ -254,12 +254,8 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			sqrtRenderData, multisRenderData, lines2D, lines1D);
 		Tabs.Add(saxeyAddonsViewModel);
 
-		DataTable rangeTable = SaxeyAddons.BuildRangeTable(linesOptions, SelectedIons.ToList(), ChargeCounts);
-		var rangeTableViewModel = new RangeTableView("Range Table", rangeTable);
-		if (rangeTable.Rows.Count > 0)
-			Tabs.Add(rangeTableViewModel);
-		else
-			Tabs.Add(new TextContentViewModel("Range Table", "Select at least one ion pair for the range table to be populated"));
+		var rangeTableView = new RangeTableView(linesOptions);
+		Tabs.Add(rangeTableView);
 
 		SelectedTab = histogram2DViewModel;
 	}
