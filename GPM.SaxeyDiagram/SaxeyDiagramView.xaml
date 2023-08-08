@@ -52,8 +52,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 
-                <TextBox Grid.Column="0" Text="{Binding IonName1.Value}"/>
-                <TextBox Grid.Column="1" Text="{Binding IonName2.Value}"/>
+                <TextBox Grid.Column="0" Text="{Binding IonName1}"/>
+                <TextBox Grid.Column="1" Text="{Binding IonName2}"/>
             </Grid>
                 <Button Content="Remove Ions" Grid.Row="5" Command="{Binding RemoveLinesCommand}"/>
             <ListBox Grid.Row="6" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}">
@@ -81,14 +81,6 @@
                                HorizontalAlignment="Left"
                                TextWrapping="WrapWithOverflow" />
                 </DataTemplate>
-                <local:RangeTableView x:Key="rangeTableView">
-                    
-                </local:RangeTableView>
-                <!--
-                <DataTemplate DataType="{x:Type local:RangeTableViewModel}">
-                    <DataGrid ItemsSource="{Binding RangeTable}" HeadersVisibility="None"/>
-                </DataTemplate>
-                -->
                 <DataTemplate DataType="{x:Type local:Histogram2DHistogram1DSideBySideViewModel}">
                     <Grid>
                         <Grid.ColumnDefinitions>

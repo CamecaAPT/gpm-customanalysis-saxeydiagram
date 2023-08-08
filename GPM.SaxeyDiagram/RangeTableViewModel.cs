@@ -36,8 +36,18 @@ internal class RangeTableViewModel : BindableBase, IDisposable
 	public string SelectionX { get; set; } = "";
 	public string SelectionY { get; set; } = "";
 
-	public ObservableObject<string> TextBoxX { get; set; } = new();
-	public ObservableObject<string> TextBoxY { get; set; } = new();
+	private string textBoxX = "";
+	private string textBoxY = "";
+	public string TextBoxX
+	{
+		get => textBoxX;
+		set => SetProperty(ref textBoxX, value);
+	}
+	public string TextBoxY
+	{
+		get => textBoxY;
+		set => SetProperty(ref textBoxY, value);
+	}
 
 	private readonly RelayCommand enterPressedX;
 	private readonly RelayCommand enterPressedY;
@@ -115,25 +125,25 @@ internal class RangeTableViewModel : BindableBase, IDisposable
 
 	public void AddIonX()
 	{
-		if (TextBoxX.Value == null)
+		if (TextBoxX == null)
 			return;
 
-		if(SaxeyAddons.ValidateIonString(TextBoxX.Value, out var match))
+		if(SaxeyAddons.ValidateIonString(TextBoxX, out var match))
 		{
 			var ionFormula = SaxeyAddons.IonFormulaFromMatch(match, linesOptions.elements, out var chargeCount);
 			if(ionFormula != null && chargeCount != null)
 			{
 				string valueToAdd;
-				if (!TextBoxX.Value.Contains('+'))
-					valueToAdd = TextBoxX.Value + "+";
+				if (!TextBoxX.Contains('+'))
+					valueToAdd = TextBoxX + "+";
 				else
-					valueToAdd = TextBoxX.Value;
+					valueToAdd = TextBoxX;
 
 				if(!XIons.Contains(valueToAdd))
 				{
 					XIons.Add(valueToAdd);
 					xCharges.Add((int)chargeCount);
-					TextBoxX.Value = "";
+					TextBoxX = "";
 					UpdateRangeTable();
 				}
 				else
@@ -152,25 +162,25 @@ internal class RangeTableViewModel : BindableBase, IDisposable
 
 	public void AddIonY()
 	{
-		if (TextBoxY.Value == null)
+		if (TextBoxY == null)
 			return;
 
-		if (SaxeyAddons.ValidateIonString(TextBoxY.Value, out var match))
+		if (SaxeyAddons.ValidateIonString(TextBoxY, out var match))
 		{
 			var ionFormula = SaxeyAddons.IonFormulaFromMatch(match, linesOptions.elements, out var chargeCount);
 			if (ionFormula != null && chargeCount != null)
 			{
 				string valueToAdd;
-				if (!TextBoxY.Value.Contains('+'))
-					valueToAdd = TextBoxY.Value + "+";
+				if (!TextBoxY.Contains('+'))
+					valueToAdd = TextBoxY + "+";
 				else
-					valueToAdd = TextBoxY.Value;
+					valueToAdd = TextBoxY;
 
 				if (!YIons.Contains(valueToAdd))
 				{
 					YIons.Add(valueToAdd);
 					yCharges.Add((int)chargeCount);
-					TextBoxY.Value = "";
+					TextBoxY = "";
 					UpdateRangeTable();
 				}
 				else

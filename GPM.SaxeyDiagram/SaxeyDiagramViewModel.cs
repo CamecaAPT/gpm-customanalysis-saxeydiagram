@@ -49,9 +49,18 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		private set => Options.ChargeCounts = value;
 	}
 
-	public ObservableObject<string> IonName1 { get; set; } = new();
-
-	public ObservableObject<string> IonName2 { get; set; } = new();
+	private string ionName1 = "";
+	private string ionName2 = "";
+	public string IonName1
+	{
+		get => ionName1;
+		set => SetProperty(ref ionName1, value);
+	}
+	public string IonName2
+	{
+		get => ionName2;
+		set => SetProperty(ref ionName2, value);
+	}
 
 	public string ListBoxSelection { get; set; } = "";
 
@@ -101,13 +110,13 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 	private void OnAddLine()
 	{
-		if(IonName1.Value == null || IonName2.Value == null)
+		if(IonName1 == null || IonName2 == null)
 		{
 			MessageBox.Show("Fill in both ion boxes");
 			return;
 		}
 
-		if(SaxeyAddons.ValidateIonString(IonName1.Value, out var match1) && SaxeyAddons.ValidateIonString(IonName2.Value, out var match2))
+		if(SaxeyAddons.ValidateIonString(IonName1, out var match1) && SaxeyAddons.ValidateIonString(IonName2, out var match2))
 		{
 			var ionFormula1 = SaxeyAddons.IonFormulaFromMatch(match1, Node.Elements, out var charge1);
 			var ionFormula2 = SaxeyAddons.IonFormulaFromMatch(match2, Node.Elements, out var charge2);
@@ -116,16 +125,16 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			if(ionFormula1 != null && ionFormula2 != null)
 			{
 				string ionToAdd1;
-				if (!IonName1.Value.Contains('+'))
-					ionToAdd1 = IonName1.Value + "+";
+				if (!IonName1.Contains('+'))
+					ionToAdd1 = IonName1 + "+";
 				else
-					ionToAdd1 = IonName1.Value;
+					ionToAdd1 = IonName1;
 
 				string ionToAdd2;
-				if (!IonName2.Value.Contains('+'))
-					ionToAdd2 = IonName2.Value + "+";
+				if (!IonName2.Contains('+'))
+					ionToAdd2 = IonName2 + "+";
 				else
-					ionToAdd2 = IonName2.Value;
+					ionToAdd2 = IonName2;
 
 				if (SelectedIons.Contains((ionToAdd1, ionToAdd2)) || SelectedIons.Contains((ionToAdd2, ionToAdd1)))
 					MessageBox.Show("Ion Already Added");
@@ -134,8 +143,8 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 					SelectedIons.Add((ionToAdd1, ionToAdd2));
 					ChargeCounts.Add(((int)charge1!, (int)charge2!));
 					//IonFormulas.Add(ionFormula);
-					IonName1.Value = "";
-					IonName2.Value = "";
+					IonName1 = "";
+					IonName2 = "";
 					runCommand.Execute(null);
 				}
 			}

@@ -34,13 +34,13 @@
                 <Button Grid.Row="0" Grid.Column="0" Content="Remove All X" Command="{Binding RemoveAllX}"/>
                 <Button Grid.Row="0" Grid.Column="1" Content="Remove All Y" Command="{Binding RemoveAllY}"/>
 
-                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding TextBoxX.Value, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding TextBoxX, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
                         <KeyBinding Command="{Binding EnterPressedX}" Key="Return"/>
                         <KeyBinding Command="{Binding EnterPressedX}" Key="Enter"/>
                     </TextBox.InputBindings>
                 </TextBox>
-                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TextBoxY.Value, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TextBoxY, UpdateSourceTrigger=PropertyChanged}">
                     <TextBox.InputBindings>
                         <KeyBinding Command="{Binding EnterPressedY}" Key="Return"/>
                         <KeyBinding Command="{Binding EnterPressedY}" Key="Enter"/>
