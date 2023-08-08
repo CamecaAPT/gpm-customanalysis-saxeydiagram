@@ -153,6 +153,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 	public void OnListViewDoubleClick()
 	{
+		if(ListBoxSelection == null || ListBoxSelection == "") return;
 		var ions = ListBoxSelection.Split(", ");
 		var index = SelectedIons.IndexOf((ions[0][1..], ions[1][..^1]));
 		//if index not found

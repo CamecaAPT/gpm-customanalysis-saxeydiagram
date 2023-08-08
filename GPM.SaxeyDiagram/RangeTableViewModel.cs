@@ -155,6 +155,7 @@ internal class RangeTableViewModel : BindableBase, IDisposable
 	public void RemoveIonX()
 	{
 		var index = XIons.IndexOf(SelectionX);
+		if (index == -1) return;
 		XIons.RemoveAt(index);
 		xCharges.RemoveAt(index);
 		UpdateRangeTable();
@@ -192,6 +193,7 @@ internal class RangeTableViewModel : BindableBase, IDisposable
 	public void RemoveIonY()
 	{
 		var index = YIons.IndexOf(SelectionY);
+		if(index == -1) return;
 		YIons.RemoveAt(index);
 		yCharges.RemoveAt(index);
 		UpdateRangeTable();
