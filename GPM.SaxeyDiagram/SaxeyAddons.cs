@@ -196,7 +196,7 @@ public static class SaxeyAddons
 		}
 	}
 
-	public static List<Vector3[]> GetLinesSaxey(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, float maxHeight)
+	public static List<Vector3[]> GetLinesSaxey(LinesOptions linesOptions, List<LineDefinition> selectedSymbols, List<(int, int)> selectedCharges, float maxHeight)
 	{
 		List<Vector3[]> lines = new();
 
@@ -206,8 +206,8 @@ public static class SaxeyAddons
 		List<int> selectedCharges2 = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
-			selectedSymbols1.Add(selectedSymbols[i].Item1);
-			selectedSymbols2.Add(selectedSymbols[i].Item2);
+			selectedSymbols1.Add(selectedSymbols[i].Ion1);
+			selectedSymbols2.Add(selectedSymbols[i].Ion2);
 
 			selectedCharges1.Add(selectedCharges[i].Item1);
 			selectedCharges2.Add(selectedCharges[i].Item2);
@@ -257,7 +257,7 @@ public static class SaxeyAddons
 		return lines;
 	}
 
-	public static List<Vector3[]> GetLines2D(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, float height)
+	public static List<Vector3[]> GetLines2D(LinesOptions linesOptions, List<LineDefinition> selectedSymbols, List<(int, int)> selectedCharges, float height)
 	{
 		List<Vector3[]> lines = new();
 		float h = (float)Math.Sqrt(height);
@@ -268,8 +268,8 @@ public static class SaxeyAddons
 		List<int> selectedCharges2 = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
-			selectedSymbols1.Add(selectedSymbols[i].Item1);
-			selectedSymbols2.Add(selectedSymbols[i].Item2);
+			selectedSymbols1.Add(selectedSymbols[i].Ion1);
+			selectedSymbols2.Add(selectedSymbols[i].Ion2);
 
 			selectedCharges1.Add(selectedCharges[i].Item1);
 			selectedCharges2.Add(selectedCharges[i].Item2);
@@ -313,7 +313,7 @@ public static class SaxeyAddons
 		return lines;
 	}
 
-	public static List<Vector3[]> GetLines1D(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, int maxHeight)
+	public static List<Vector3[]> GetLines1D(LinesOptions linesOptions, List<LineDefinition> selectedSymbols, List<(int, int)> selectedCharges, int maxHeight)
 	{
 		List<Vector3[]> lines = new();
 
@@ -323,8 +323,8 @@ public static class SaxeyAddons
 		List<int> selectedCharges2 = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
-			selectedSymbols1.Add(selectedSymbols[i].Item1);
-			selectedSymbols2.Add(selectedSymbols[i].Item2);
+			selectedSymbols1.Add(selectedSymbols[i].Ion1);
+			selectedSymbols2.Add(selectedSymbols[i].Ion2);
 
 			selectedCharges1.Add(selectedCharges[i].Item1);
 			selectedCharges2.Add(selectedCharges[i].Item2);

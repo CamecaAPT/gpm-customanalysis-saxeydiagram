@@ -97,9 +97,9 @@ public class SaxeyDiagramOptions : BindableBase
 	[Display(Name = "Where to show lines", Description = "Which graphs to render lines onto.")]
 	public LineSelections LineSelections { get; set; } = new LineSelections();
 
-	private ObservableCollection<(string, string)> ionSelections = new();
+	private ObservableCollection<LineDefinition> ionSelections = new();
 	[Display(AutoGenerateField = false)]
-	public ObservableCollection<(string, string)> IonSelections
+	public ObservableCollection<LineDefinition> IonSelections
 	{
 		get => ionSelections;
 		set => SetProperty(ref ionSelections, value);

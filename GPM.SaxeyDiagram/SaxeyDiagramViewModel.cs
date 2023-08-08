@@ -37,7 +37,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	private readonly RelayCommand removeLines;
 	public ICommand RemoveLinesCommand => removeLines;
 
-	public ObservableCollection<(string, string)> SelectedIons
+	public ObservableCollection<LineDefinition> SelectedIons
 	{
 		get => Options.IonSelections;
 		set => Options.IonSelections = value;
@@ -62,7 +62,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		set => SetProperty(ref ionName2, value);
 	}
 
-	public string ListBoxSelection { get; set; } = "";
+	public LineDefinition? ListBoxSelection { get; set; } = null;
 
 	private readonly RelayCommand listViewDoubleClick;
 	public ICommand ListViewDoubleClick => listViewDoubleClick;
@@ -136,11 +136,13 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 				else
 					ionToAdd2 = IonName2;
 
-				if (SelectedIons.Contains((ionToAdd1, ionToAdd2)) || SelectedIons.Contains((ionToAdd2, ionToAdd1)))
-					MessageBox.Show("Ion Already Added");
+				LineDefinition lineDef = new(ionToAdd1, ionToAdd2);
+
+				if (SelectedIons.Contains(lineDef))
+					MessageBox.Show("Ion Pair Already Added");
 				else
 				{
-					SelectedIons.Add((ionToAdd1, ionToAdd2));
+					SelectedIons.Add(lineDef);
 					ChargeCounts.Add(((int)charge1!, (int)charge2!));
 					//IonFormulas.Add(ionFormula);
 					IonName1 = "";
@@ -153,10 +155,9 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 	public void OnListViewDoubleClick()
 	{
-		if(ListBoxSelection == null || ListBoxSelection == "") return;
-		var ions = ListBoxSelection.Split(", ");
-		var index = SelectedIons.IndexOf((ions[0][1..], ions[1][..^1]));
-		//if index not found
+		if(ListBoxSelection == null) return;
+		var index = SelectedIons.IndexOf(ListBoxSelection);
+		//if index found
 		if (index != -1)
 		{
 			SelectedIons.RemoveAt(index);

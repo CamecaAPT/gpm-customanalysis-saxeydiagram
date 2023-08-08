@@ -72,6 +72,11 @@
                         <b:InvokeCommandAction Command="{Binding ListViewDoubleClick}"/>
                     </b:EventTrigger>
                 </b:Interaction.Triggers>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Display}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
 
