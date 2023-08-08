@@ -17,7 +17,7 @@
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Label Grid.Row="0" Content="Ion Names (e.g.GaN3++ or H2)" HorizontalContentAlignment="Center"/>
             <Grid Grid.Row="1">
@@ -47,8 +47,8 @@
                     </TextBox.InputBindings>
                 </TextBox>
              
-                <ListBox Grid.Row="2" Grid.Column="0" ItemsSource="{Binding XIons}" SelectedItem="{Binding SelectionX}" MouseDoubleClick="ListBox_MouseDoubleClickX"/>
-                <ListBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding YIons}" SelectedItem="{Binding SelectionY}" MouseDoubleClick="ListBox_MouseDoubleClickY"/>
+                <ListBox Grid.Row="2" Grid.Column="0" ItemsSource="{Binding XIons}" SelectedItem="{Binding SelectionX}" MouseDoubleClick="ListBox_MouseDoubleClickX" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+                <ListBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding YIons}" SelectedItem="{Binding SelectionY}" MouseDoubleClick="ListBox_MouseDoubleClickY" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
             </Grid>
         </Grid>
 

@@ -30,7 +30,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <Button Grid.Row="0"
@@ -56,7 +56,7 @@
                 <TextBox Grid.Column="1" Text="{Binding IonName2}"/>
             </Grid>
                 <Button Content="Remove Ions" Grid.Row="5" Command="{Binding RemoveLinesCommand}"/>
-            <ListBox Grid.Row="6" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}">
+            <ListBox Grid.Row="6" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}" ScrollViewer.VerticalScrollBarVisibility="Visible">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="MouseDoubleClick">
                         <b:InvokeCommandAction Command="{Binding ListViewDoubleClick}"/>

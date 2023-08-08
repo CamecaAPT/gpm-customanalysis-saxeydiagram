@@ -70,29 +70,6 @@ internal class RangeTableViewModel : BindableBase, IDisposable
 		this.linesOptions = linesOptions;
 	}
 
-	private void DummyRangeTable(int rows, int cols)
-	{
-		AutoGenerateColumns = false;
-		RangeTable.Clear();
-		RangeTable.Rows.Clear();
-		RangeTable.Columns.Clear();
-
-		for (int col = 0; col < cols; col++)
-			RangeTable.Columns.Add();
-		int totalCount = 0;
-		for (int row = 0; row<rows; row++)
-		{
-			List<object> rowList = new();
-			for(int col=0; col<cols; col++)
-			{
-				rowList.Add($"{totalCount++}");
-			}
-			RangeTable.Rows.Add(rowList.ToArray());
-		}
-
-		AutoGenerateColumns = true;
-	}
-
 	private void UpdateRangeTable()
 	{
 		AutoGenerateColumns = false;
