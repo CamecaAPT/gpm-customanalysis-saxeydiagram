@@ -23,6 +23,8 @@ public static class SaxeyAddons
 
 		var groups = match.Groups.Values.ToList();
 
+		List<string> badElements = new();
+
 		foreach(var fullSymbol in groups[1].Captures.ToList())
 		{
 			var fullSymArr = fullSymbol.Value.ToCharArray();
@@ -43,11 +45,28 @@ public static class SaxeyAddons
 
 			if(!elements.ContainsKey(element))
 			{
-				MessageBox.Show($"{element} is not a valid element");
-				return null;
+				badElements.Add(element);
+				//MessageBox.Show($"{element} is not a valid element");
+				//return null;
 			}
 
 			components.Add(new IonFormula.Component(element, num));
+		}
+		
+		if(badElements.Count > 0)
+		{
+			StringBuilder sb = new();
+			for(int i=0; i<badElements.Count; i++)
+			{
+				sb.Append(badElements[i]);
+				if (i + 1 < badElements.Count)
+					sb.Append(", ");
+			}
+
+			string phrase = badElements.Count == 1 ? "is not a valid element" : "are not valid elements";
+
+			MessageBox.Show($"{sb} {phrase}");
+			return null;
 		}
 
 		chargeCount = groups[2].Value.Length;
@@ -62,13 +81,14 @@ public static class SaxeyAddons
 	 * Make sure has only alphanumerics and + signs
 	 * also, once theres a plus it can only be plusses
 	 */
-	public static bool ValidateIonString(string ionString, out Match match)
+	public static bool ValidateIonString(string ionString, out Match match, int? ionNum = null)
 	{
 		Regex regex = new(@"(?:([A-Z][a-z]?\d*))+([+]{0,5})");
 		match = regex.Match(ionString);
 		if(!match.Success || match.Value != ionString)
 		{
-			MessageBox.Show("Invalid format for Ion");
+			string ionNumStr = ionNum == null ? "" : ((int)ionNum).ToString();
+			MessageBox.Show($"Invalid format for Ion {ionNumStr}");
 			return false;
 		}
 		return true;

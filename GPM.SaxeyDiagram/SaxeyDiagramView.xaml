@@ -51,9 +51,19 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                
-                <TextBox Grid.Column="0" Text="{Binding IonName1}"/>
-                <TextBox Grid.Column="1" Text="{Binding IonName2}"/>
+
+                <TextBox Grid.Column="0" Text="{Binding IonName1, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Command="{Binding AddLineCommand}" Key="Return"/>
+                        <KeyBinding Command="{Binding AddLineCommand}" Key="Enter"/>
+                    </TextBox.InputBindings>
+                </TextBox>
+                <TextBox Grid.Column="1" Text="{Binding IonName2, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Command="{Binding AddLineCommand}" Key="Return"/>
+                        <KeyBinding Command="{Binding AddLineCommand}" Key="Enter"/>
+                    </TextBox.InputBindings>
+                </TextBox>
             </Grid>
                 <Button Content="Remove Ions" Grid.Row="5" Command="{Binding RemoveLinesCommand}"/>
             <ListBox Grid.Row="6" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}" ScrollViewer.VerticalScrollBarVisibility="Visible">

@@ -110,13 +110,13 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 	private void OnAddLine()
 	{
-		if(IonName1 == null || IonName2 == null)
+		if(IonName1 == null || IonName2 == null || IonName1 == "" || IonName2 == "")
 		{
 			MessageBox.Show("Fill in both ion boxes");
 			return;
 		}
 
-		if(SaxeyAddons.ValidateIonString(IonName1, out var match1) && SaxeyAddons.ValidateIonString(IonName2, out var match2))
+		if(SaxeyAddons.ValidateIonString(IonName1, out var match1, 1) && SaxeyAddons.ValidateIonString(IonName2, out var match2, 2))
 		{
 			var ionFormula1 = SaxeyAddons.IonFormulaFromMatch(match1, Node.Elements, out var charge1);
 			var ionFormula2 = SaxeyAddons.IonFormulaFromMatch(match2, Node.Elements, out var charge2);
