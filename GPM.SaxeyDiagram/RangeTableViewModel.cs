@@ -19,6 +19,8 @@ internal class RangeTableViewModel : BindableBase, IDisposable
 {
 	public DataTable RangeTable { get; set; } = new();
 
+	public SaxeyDiagramOptions Options { get; set; }
+
 	private bool autoGenColumns = true;
 
 	public bool AutoGenerateColumns
@@ -27,11 +29,27 @@ internal class RangeTableViewModel : BindableBase, IDisposable
 		set => SetProperty(ref autoGenColumns, value);
 	}
 	
-	public ObservableCollection<string> XIons { get; set; } = new();
-	public ObservableCollection<string> YIons { get; set; } = new();
+	public ObservableCollection<string> XIons 
+	{ 
+		get => Options.RangeTableXIons;
+		set => Options.RangeTableXIons = value; 
+	}
+	public ObservableCollection<string> YIons
+	{
+		get => Options.RangeTableYIons;
+		set => Options.RangeTableYIons = value; 
+	}
 
-	private List<int> xCharges = new();
-	private List<int> yCharges = new();
+	private List<int> xCharges
+	{
+		get => Options.RangeTableXCharges;
+		set => Options.RangeTableXCharges = value;
+	}
+	private List<int> yCharges
+	{
+		get => Options.RangeTableYCharges;
+		set => Options.RangeTableYCharges = value;
+	}
 
 	public string SelectionX { get; set; } = "";
 	public string SelectionY { get; set; } = "";
@@ -61,13 +79,16 @@ internal class RangeTableViewModel : BindableBase, IDisposable
 
 	private LinesOptions linesOptions;
 
-	public RangeTableViewModel(LinesOptions linesOptions)
+	public RangeTableViewModel(LinesOptions linesOptions, SaxeyDiagramOptions options)
 	{
 		enterPressedX = new(AddIonX);
 		enterPressedY = new(AddIonY);
 		removeAllX = new(ClearX);
 		removeAllY = new(ClearY);
 		this.linesOptions = linesOptions;
+		Options = options;
+
+		UpdateRangeTable();
 	}
 
 	private void UpdateRangeTable()

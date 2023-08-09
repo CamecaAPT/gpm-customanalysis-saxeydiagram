@@ -318,7 +318,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		/*
 		 * Range Table
 		 */
-		var rangeTableView = new RangeTableView((LinesOptions)linesOptions);
+		var rangeTableView = new RangeTableView((LinesOptions)linesOptions, Options);
 		Tabs.Add(rangeTableView);
 
 		UpdateLines();
