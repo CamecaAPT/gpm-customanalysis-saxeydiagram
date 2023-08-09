@@ -11,11 +11,10 @@ internal class Histogram2DContentViewModel : IDisposable
 
 	public ObservableCollection<IRenderData> Histogram2DRenderData { get; }
 
-	public Histogram2DContentViewModel(string title, IHistogram2DRenderData content, List<ILineRenderData> lines)
+	public Histogram2DContentViewModel(string title, IHistogram2DRenderData content)
 	{
 		Title = title;
 		Histogram2DRenderData = new ObservableCollection<IRenderData> { content };
-		Histogram2DRenderData.AddRange(lines);
 	}
 
 	public void Dispose()
