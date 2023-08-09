@@ -22,10 +22,10 @@ public partial class RangeTableView : UserControl
 {
 	public string Title { get; } = "Range Table";
 
-	public RangeTableView(LinesOptions linesOptions)
+	public RangeTableView(LinesOptions linesOptions, SaxeyDiagramOptions options)
 	{
 		InitializeComponent();
-		DataContext = new RangeTableViewModel(linesOptions);
+		DataContext = new RangeTableViewModel(linesOptions, options);
 	}
 
 	private void ListBox_MouseDoubleClickX(object sender, MouseButtonEventArgs e)

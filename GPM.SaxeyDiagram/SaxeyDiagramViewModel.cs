@@ -22,6 +22,11 @@ namespace GPM.CustomAnalysis.SaxeyDiagram;
 
 internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 {
+	private LinesOptions? linesOptions = null;
+	private int? histogramMaxHeight = null;
+	private Histogram2DContentViewModel? saxeyViewModel = null;
+	private Histogram2DHistogram1DSideBySideViewModel? sideBySideViewModel = null;
+
 	public const string UniqueId = "GPM.CustomAnalysis.SaxeyDiagram.SaxeyDiagramViewModel";
 
 	private readonly IRenderDataFactory renderDataFactory;
@@ -108,6 +113,59 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			RunCommand.Execute(null);
 	}
 
+	private void UpdateLines()
+	{
+		if (saxeyViewModel == null || sideBySideViewModel == null || linesOptions == null || histogramMaxHeight == null)
+			return;
+
+		//clear lines
+		while(saxeyViewModel.Histogram2DRenderData.Count > 1)
+		{
+			saxeyViewModel.Histogram2DRenderData.RemoveAt(1);
+			sideBySideViewModel.Histogram2DRenderData.RemoveAt(1);
+			sideBySideViewModel.Histogram1DRenderData.RemoveAt(1);
+		}
+
+		//then add lines
+
+		/*
+		 * Saxey Lines
+		 */
+		List<ILineRenderData> saxeyLines = new();
+		if (Options.LineSelections.SaxeyDiagram)
+		{
+			(var lineSaxeyPoints, var saxeyLabels) = SaxeyAddons.GetLinesSaxey((LinesOptions)linesOptions, SelectedIons.ToList(), ChargeCounts, Options.MassExtent);
+			for(int i=0; i<lineSaxeyPoints.Count; i++)
+				saxeyLines.Add(renderDataFactory.CreateLine(lineSaxeyPoints[i], Colors.Red, 3f, saxeyLabels[i]));
+		}
+		saxeyViewModel.Histogram2DRenderData.AddRange(saxeyLines);
+
+		/*
+		 * Time Space Lines
+		 */
+		List<ILineRenderData> lines2D = new();
+		if (Options.LineSelections.LinearizedDiagram)
+		{
+			(var line2DPoints, var lineNames) = SaxeyAddons.GetLines2D((LinesOptions)linesOptions, SelectedIons.ToList(), ChargeCounts, Options.MassExtent);
+			for(int i=0; i<line2DPoints.Count; i++)
+				lines2D.Add(renderDataFactory.CreateLine(line2DPoints[i], Colors.Red, 3f, lineNames[i]));
+		}
+		sideBySideViewModel.Histogram2DRenderData.AddRange(lines2D);
+
+		/*
+		 * Histogram Lines
+		 */
+		List<ILineRenderData> lines1D = new();
+		if (Options.LineSelections.CalculatedMassSpectrum)
+		{
+			int maxHeight = (int)histogramMaxHeight;
+			(var line1DPoints, var lineNames) = SaxeyAddons.GetLines1D((LinesOptions)linesOptions, SelectedIons.ToList(), ChargeCounts, maxHeight);
+			for(int i=0; i<line1DPoints.Count; i++)
+				lines1D.Add(renderDataFactory.CreateLine(line1DPoints[i], Colors.Red, 3f, lineNames[i]));
+		}
+		sideBySideViewModel.Histogram1DRenderData.AddRange(lines1D);
+	}
+
 	private void OnAddLine()
 	{
 		if(IonName1 == null || IonName2 == null || IonName1 == "" || IonName2 == "")
@@ -144,10 +202,10 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 				{
 					SelectedIons.Add(lineDef);
 					ChargeCounts.Add(((int)charge1!, (int)charge2!));
-					//IonFormulas.Add(ionFormula);
 					IonName1 = "";
 					IonName2 = "";
-					runCommand.Execute(null);
+
+					UpdateLines();
 				}
 			}
 		}
@@ -162,7 +220,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		{
 			SelectedIons.RemoveAt(index);
 			ChargeCounts.RemoveAt(index);
-			runCommand.Execute(null);
+			UpdateLines();
 		}
 	}
 
@@ -170,7 +228,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	{
 		SelectedIons.Clear();
 		ChargeCounts.Clear();
-		runCommand.Execute(null);
+		UpdateLines();
 	}
 
 	private async Task OnRun()
@@ -204,32 +262,36 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 		var calculator = (IIonFormulaIsotopeCalculator)data[6];
 
-		LinesOptions linesOptions = new()
+		this.linesOptions = new()
 		{
 			elements = Node.Elements,
 			calculator = calculator,
 			calculatorOptions = new IonFormulaIsotopeOptions() { MinimumIsotopeAbundance = .01 }
 		};
 
-		List<ILineRenderData> saxeyLines = new();
-		if (Options.LineSelections.SaxeyDiagram)
-		{
-			List<Vector3[]> lineSaxeyPoints = SaxeyAddons.GetLinesSaxey(linesOptions, SelectedIons.ToList(), ChargeCounts, Options.MassExtent);
-			foreach (var line in lineSaxeyPoints)
-				saxeyLines.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
-		}
+		this.histogramMaxHeight = (int)data[4];
 
+		/*
+		 * Saxey Plot
+		 */
 		var renderData = renderDataFactory.CreateHistogram2D(
 			saxeyData,
 			new Vector2(Options.Resolution, Options.Resolution),
 			colorMap,
 			new Vector2(Options.XMin, Options.YMin),
-			minValue: CSaxeyDiagram.MinBinValueInclusive);
+			minValue: CSaxeyDiagram.MinBinValueInclusive,
+			name: "Saxey Plot");
 		var histogram2DViewModel = new Histogram2DContentViewModel(
 			"Saxey Diagram",
-			renderData, saxeyLines);
+			renderData);
 		Tabs.Add(histogram2DViewModel);
 
+		this.saxeyViewModel = histogram2DViewModel;
+
+
+		/*
+		 * Time Space Data
+		 */
 		ReadOnlyMemory2D<float> sqrtData = (ReadOnlyMemory2D<float>)data[1];
 		float newResolution = (float)data[2];
 		var sqrtRenderData = renderDataFactory.CreateHistogram2D(
@@ -237,36 +299,30 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			new Vector2(newResolution, newResolution),
 			colorMap,
 			new Vector2(Options.XMin, Options.YMin),
-			minValue: CSaxeyDiagram.MinBinValueInclusive);
+			minValue: CSaxeyDiagram.MinBinValueInclusive,
+			name: "Time Space Plot");
 		
-
+		/*
+		 * Histogram Data
+		 */
 		ReadOnlyMemory<Vector2> multisData = (ReadOnlyMemory<Vector2>)data[3];
-		var multisRenderData = renderDataFactory.CreateHistogram(multisData, Colors.Black, .5f);
+		var multisRenderData = renderDataFactory.CreateHistogram(multisData, Colors.Black, .5f, name: "Multi-atom Histogram");
 
-		List<ILineRenderData> lines2D = new();
-		if (Options.LineSelections.LinearizedDiagram)
-		{
-			List<Vector3[]> line2DPoints = SaxeyAddons.GetLines2D(linesOptions, SelectedIons.ToList(), ChargeCounts, Options.MassExtent);
-			foreach (var line in line2DPoints)
-				lines2D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
-		}
-
-		List<ILineRenderData> lines1D = new();
-		if (Options.LineSelections.CalculatedMassSpectrum)
-		{
-			int maxHeight = (int)data[4];
-			List<Vector3[]> line1DPoints = SaxeyAddons.GetLines1D(linesOptions, SelectedIons.ToList(), ChargeCounts, maxHeight);
-			foreach (var line in line1DPoints)
-				lines1D.Add(renderDataFactory.CreateLine(line, Colors.Red, 3f));
-		}
 
 		var saxeyAddonsViewModel = new Histogram2DHistogram1DSideBySideViewModel(
 			"Time Space and Multi Atom Mass Spectrum",
-			sqrtRenderData, multisRenderData, lines2D, lines1D);
+			sqrtRenderData, multisRenderData);
 		Tabs.Add(saxeyAddonsViewModel);
 
-		var rangeTableView = new RangeTableView(linesOptions);
+		this.sideBySideViewModel = saxeyAddonsViewModel;
+
+		/*
+		 * Range Table
+		 */
+		var rangeTableView = new RangeTableView((LinesOptions)linesOptions, Options);
 		Tabs.Add(rangeTableView);
+
+		UpdateLines();
 
 		SelectedTab = histogram2DViewModel;
 	}

@@ -108,8 +108,40 @@ public class SaxeyDiagramOptions : BindableBase
 	private List<(int, int)> chargeCounts = new();
 	[Display(AutoGenerateField = false)]
 	public List<(int, int)> ChargeCounts
-	{ 
+	{
 		get => chargeCounts;
 		set => SetProperty(ref chargeCounts, value);
+	}
+
+	private List<int> rangeTableXCharges = new();
+	[Display(AutoGenerateField = false)]
+	public List<int> RangeTableXCharges
+	{ 
+		get => rangeTableXCharges;
+		set => SetProperty(ref rangeTableXCharges, value);
+	}
+
+	private List<int> rangeTableYCharges = new();
+	[Display(AutoGenerateField = false)]
+	public List<int> RangeTableYCharges
+	{
+		get => rangeTableYCharges;
+		set => SetProperty(ref rangeTableYCharges, value);
+	}
+
+	private ObservableCollection<string> rangeTableXIons = new();
+	[Display(AutoGenerateField = false)]
+	public ObservableCollection<string> RangeTableXIons
+	{
+		get => rangeTableXIons;
+		set => SetProperty(ref rangeTableXIons, value);
+	}
+
+	private ObservableCollection<string> rangeTableYIons = new();
+	[Display(AutoGenerateField = false)]
+	public ObservableCollection<string> RangeTableYIons
+	{
+		get => rangeTableYIons;
+		set => SetProperty(ref rangeTableYIons, value);
 	}
 }
