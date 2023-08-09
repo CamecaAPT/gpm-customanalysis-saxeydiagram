@@ -17,11 +17,19 @@ public class LineDefinition : BindableBase, IEquatable<LineDefinition>
 		UpdateDisplay();
 	}
 
+	public LineDefinition()
+	{
+		Ion1 = "";
+		Ion2 = "";
+		IsVisible = true;
+		UpdateDisplay();
+	}
+
 	private string display = "";
 	public string Display
 	{
 		get => display;
-		private set => SetProperty(ref display, value);
+		set => SetProperty(ref display, value);
 	}
 
 	private string ion1 = "";

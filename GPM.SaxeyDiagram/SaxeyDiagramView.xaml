@@ -66,7 +66,7 @@
                 </TextBox>
             </Grid>
                 <Button Content="Remove Ions" Grid.Row="5" Command="{Binding RemoveLinesCommand}"/>
-            <ListBox Grid.Row="6" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}" ScrollViewer.VerticalScrollBarVisibility="Visible">
+            <ListBox Grid.Row="6" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}" ScrollViewer.VerticalScrollBarVisibility="Visible" HorizontalContentAlignment="Stretch">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="MouseDoubleClick">
                         <b:InvokeCommandAction Command="{Binding ListViewDoubleClick}"/>
@@ -74,7 +74,17 @@
                 </b:Interaction.Triggers>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Display}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="0" Text="{Binding Display}"/>
+                            <DatePicker Grid.Column="1"/>
+                            <CheckBox Grid.Column="2" Content="Show" IsChecked="{Binding IsVisible}"/>
+                        </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
