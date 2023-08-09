@@ -196,9 +196,10 @@ public static class SaxeyAddons
 		}
 	}
 
-	public static List<Vector3[]> GetLinesSaxey(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, float maxHeight)
+	public static (List<Vector3[]>, List<string>) GetLinesSaxey(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, float maxHeight)
 	{
 		List<Vector3[]> lines = new();
+		List<string> lineLabels = new();
 
 		List<string> selectedSymbols1 = new();
 		List<string> selectedSymbols2 = new();
@@ -249,17 +250,29 @@ public static class SaxeyAddons
 							xVal += deltaX;
 						} while (yVal <= maxHeight && xVal <= maxHeight);
 						lines.Add(line.ToArray());
+
+						StringBuilder sb = new();
+						sb.Append($"({ion1Sym}");
+						if(ion1Masses.Count > 1)
+							sb.Append($"[{mass1.ToString("f1")}]");
+						sb.Append($", {ion2Sym}");
+						if (ion2Masses.Count > 1)
+							sb.Append($"[{mass2.ToString("f2")}]");
+						sb.Append(')');
+
+						lineLabels.Add(sb.ToString());
 					}
 				}
 			}
 		}
 
-		return lines;
+		return (lines, lineLabels);
 	}
 
-	public static List<Vector3[]> GetLines2D(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, float height)
+	public static (List<Vector3[]>, List<string>) GetLines2D(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, float height)
 	{
 		List<Vector3[]> lines = new();
+		List<string> lineLabels = new();
 		float h = (float)Math.Sqrt(height);
 
 		List<string> selectedSymbols1 = new();
@@ -304,18 +317,30 @@ public static class SaxeyAddons
 						arr[0] = point1;
 						arr[1] = point2;
 						lines.Add(arr);
+
+						StringBuilder sb = new();
+						sb.Append($"({ion1}");
+						if (ion1Masses.Count > 1)
+							sb.Append($"[{mass1.ToString("f1")}]");
+						sb.Append($", {ion2}");
+						if (ion2Masses.Count > 1)
+							sb.Append($"[{mass2.ToString("f2")}]");
+						sb.Append(')');
+
+						lineLabels.Add(sb.ToString());
 					}
 				}
 			}
 		}
 
 
-		return lines;
+		return (lines, lineLabels);
 	}
 
-	public static List<Vector3[]> GetLines1D(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, int maxHeight)
+	public static (List<Vector3[]>, List<string>) GetLines1D(LinesOptions linesOptions, List<(string, string)> selectedSymbols, List<(int, int)> selectedCharges, int maxHeight)
 	{
 		List<Vector3[]> lines = new();
+		List<string> lineLabels = new();
 
 		List<string> selectedSymbols1 = new();
 		List<string> selectedSymbols2 = new();
@@ -361,12 +386,23 @@ public static class SaxeyAddons
 						arr[0] = point1;
 						arr[1] = point2;
 						lines.Add(arr);
+
+						StringBuilder sb = new();
+						sb.Append($"({ion1}");
+						if (ion1Masses.Count > 1)
+							sb.Append($"[{mass1.ToString("f1")}]");
+						sb.Append($", {ion2}");
+						if (ion2Masses.Count > 1)
+							sb.Append($"[{mass2.ToString("f2")}]");
+						sb.Append(')');
+
+						lineLabels.Add(sb.ToString());
 					}
 				}
 			}
 		}
 
-		return lines;
+		return (lines, lineLabels);
 	}
 
 
@@ -465,8 +501,6 @@ public static class SaxeyAddons
 
 public struct LinesOptions
 {
-	//public List<(string, string)> selectedSymbols;
-	//public List<(int, int)> selectedCharges;
 	public Dictionary<string, IElement> elements;
 	public IIonFormulaIsotopeCalculator calculator;
 	public IonFormulaIsotopeOptions calculatorOptions;
