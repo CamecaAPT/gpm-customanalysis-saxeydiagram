@@ -113,7 +113,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			RunCommand.Execute(null);
 	}
 
-	private void UpdateLines()
+	public void UpdateLines()
 	{
 		if (saxeyViewModel == null || sideBySideViewModel == null || linesOptions == null || histogramMaxHeight == null)
 			return;

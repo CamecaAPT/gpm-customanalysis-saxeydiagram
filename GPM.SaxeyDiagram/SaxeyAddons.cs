@@ -208,6 +208,8 @@ public static class SaxeyAddons
 		List<int> selectedCharges2 = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
+			if (!selectedSymbols[i].IsVisible) continue;
+
 			selectedSymbols1.Add(selectedSymbols[i].Ion1);
 			selectedSymbols2.Add(selectedSymbols[i].Ion2);
 
@@ -224,7 +226,7 @@ public static class SaxeyAddons
 		const float deltaX = .1f;
 
 		HashSet<(float, float)> addedLinesSet = new();
-		for (int i = 0; i < selectedSymbols.Count; i++)
+		for (int i = 0; i < selectedSymbols1.Count; i++)
 		{
 			var ion1Sym = selectedSymbols1[i];
 			var ion1Masses = symbolToMassDict1[ion1Sym];
@@ -282,6 +284,8 @@ public static class SaxeyAddons
 		List<int> selectedCharges2 = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
+			if (!selectedSymbols[i].IsVisible) continue;
+
 			selectedSymbols1.Add(selectedSymbols[i].Ion1);
 			selectedSymbols2.Add(selectedSymbols[i].Ion2);
 
@@ -293,7 +297,7 @@ public static class SaxeyAddons
 		var symbolToMassDict2 = MakeSymbolToMassDict(linesOptions, selectedSymbols2 ,selectedCharges2);
 
 		HashSet<(float, float)> addedLinesSet = new();
-		for (int i = 0; i < selectedSymbols.Count; i++)
+		for (int i = 0; i < selectedSymbols1.Count; i++)
 		{
 			var ion1 = selectedSymbols1[i];
 			var ion1Masses = symbolToMassDict1[ion1];
@@ -349,6 +353,8 @@ public static class SaxeyAddons
 		List<int> selectedCharges2 = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
+			if (!selectedSymbols[i].IsVisible) continue;
+
 			selectedSymbols1.Add(selectedSymbols[i].Ion1);
 			selectedSymbols2.Add(selectedSymbols[i].Ion2);
 
@@ -361,7 +367,7 @@ public static class SaxeyAddons
 
 		HashSet<(float, float)> addedLinesSet = new();
 
-		for (int i = 0; i < selectedSymbols.Count; i++)
+		for (int i = 0; i < selectedSymbols1.Count; i++)
 		{
 			var ion1 = selectedSymbols1[i];
 			var ion1Masses = symbolToMassDict1[ion1];

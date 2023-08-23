@@ -82,8 +82,8 @@
                             </Grid.ColumnDefinitions>
                             
                             <TextBlock Grid.Column="0" Text="{Binding Display}"/>
-                            <DatePicker Grid.Column="1"/>
-                            <CheckBox Grid.Column="2" Content="Show" IsChecked="{Binding IsVisible}"/>
+                            <RibbonCheckBox />
+                            <CheckBox Grid.Column="2" Content="Show" IsChecked="{Binding IsVisible}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
