@@ -243,7 +243,19 @@ public static class SaxeyAddons
 				} while (t <= 1);
 
 				pointsList.Add(line.ToArray());
-				namesList.Add(lineDef.Display);
+
+				StringBuilder sb = new();
+				sb.Append($"({lineDef.Ion1}");
+				if (symbolToMassDict1[lineDef.Ion1].Count > 1)
+					sb.Append($"[{mass1.ToString("f1")}]");
+				sb.Append($", {lineDef.Ion2}");
+				if (symbolToMassDict2[lineDef.Ion2].Count > 1)
+					sb.Append($"[{mass2.ToString("f2")}]");
+				sb.Append(") - Dissociation");
+
+				namesList.Add(sb.ToString());
+
+
 				colorsList.Add(lineDef.Color);
 			}
 		}
