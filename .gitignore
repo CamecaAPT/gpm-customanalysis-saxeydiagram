@@ -98,3 +98,4 @@ Interop/
 *.psess
 *.vsp
 *.vspx
+GPM.SaxeyDiagram/LineColorGenerator.cs
