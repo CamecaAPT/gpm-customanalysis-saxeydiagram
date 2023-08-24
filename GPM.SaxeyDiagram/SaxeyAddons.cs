@@ -128,7 +128,7 @@ public static class SaxeyAddons
 		return symbolToMassDict;
 	}
 
-	public static void BuildRangeTable(DataTable rangeTable, LinesOptions linesOptions, List<string> symbolsX, List<string> symbolsY, List<int> chargesX, List<int> chargesY)
+	public static void BuildRangeTable(DataTable rangeTable, LinesOptions linesOptions, List<string> symbolsX, List<string> symbolsY, List<int> chargesX, List<int> chargesY, int decimalPlaces)
 	{
 		/*
 		 * For now, Item1 will be on the side and item2 on top
@@ -150,7 +150,7 @@ public static class SaxeyAddons
 		}
 
 		//add what we want for column headers
-		List<object> row = new() { "", "" };
+		List<object> row = new() { "(mass/charge)", "" };
 		foreach (var symbolMassesPair in symbolToMassDictX)
 		{
 			foreach(var _ in symbolMassesPair.Value)
@@ -163,7 +163,7 @@ public static class SaxeyAddons
 		foreach (var symbolMassesPair in symbolToMassDictX)
 		{
 			foreach(var mass in symbolMassesPair.Value)
-				row.Add(mass.ToString("f2"));
+				row.Add(mass.ToString($"f{decimalPlaces}"));
 		}
 		rangeTable.Rows.Add(row.ToArray());
 
@@ -177,7 +177,7 @@ public static class SaxeyAddons
 
 			foreach(var mass1 in ion1Masses)
 			{
-				row = new() { ion1Formula, mass1.ToString("f2") };
+				row = new() { ion1Formula, mass1.ToString($"f{decimalPlaces}") };
 
 				for (int j = 0; j < keysX.Count; j++)
 				{
@@ -187,7 +187,10 @@ public static class SaxeyAddons
 					foreach(var mass2 in ion2Masses)
 					{
 						var dtofSquared = Math.Pow(Math.Sqrt(mass1) - Math.Sqrt(mass2), 2);
-						row.Add(dtofSquared.ToString("f2"));
+						if (dtofSquared != 0)
+							row.Add(dtofSquared.ToString($"f{decimalPlaces}"));
+						else
+							row.Add("");
 					}
 				}
 				rangeTable.Rows.Add(row.ToArray());

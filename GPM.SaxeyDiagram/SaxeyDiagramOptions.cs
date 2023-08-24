@@ -97,6 +97,14 @@ public class SaxeyDiagramOptions : BindableBase
 	[Display(Name = "Where to show lines", Description = "Which graphs to render lines onto.")]
 	public LineSelections LineSelections { get; set; } = new LineSelections();
 
+	private int rangeTableDecimalPlaces = 1;
+	[Display(Name = "Range Table Decimal Places")]
+	public int RangeTableDecimalPlaces
+	{
+		get => rangeTableDecimalPlaces;
+		set => SetProperty(ref rangeTableDecimalPlaces, value);
+	}
+
 	private ObservableCollection<LineDefinition> ionSelections = new();
 	[Display(AutoGenerateField = false)]
 	public ObservableCollection<LineDefinition> IonSelections

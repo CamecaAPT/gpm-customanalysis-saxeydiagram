@@ -99,7 +99,7 @@ internal class RangeTableViewModel : BindableBase, IDisposable
 		RangeTable.Rows.Clear();
 		RangeTable.Columns.Clear();
 
-		SaxeyAddons.BuildRangeTable(RangeTable, linesOptions, XIons.ToList(), YIons.ToList(), xCharges, yCharges);
+		SaxeyAddons.BuildRangeTable(RangeTable, linesOptions, XIons.ToList(), YIons.ToList(), xCharges, yCharges, Options.RangeTableDecimalPlaces);
 
 		AutoGenerateColumns = true;
 	}
