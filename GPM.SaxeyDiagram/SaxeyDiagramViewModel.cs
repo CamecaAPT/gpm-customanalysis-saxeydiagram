@@ -137,18 +137,18 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		}
 
 		//clear lines
-		while(saxeyViewModel.Histogram2DRenderData.Count > 1)
-		{
+		while (saxeyViewModel.Histogram2DRenderData.Count > 1)
 			saxeyViewModel.Histogram2DRenderData.RemoveAt(1);
+		while (sideBySideViewModel.Histogram2DRenderData.Count > 1)
 			sideBySideViewModel.Histogram2DRenderData.RemoveAt(1);
+		while (sideBySideViewModel.Histogram1DRenderData.Count > 1)
 			sideBySideViewModel.Histogram1DRenderData.RemoveAt(1);
-		}
 
 		//then add lines
 
 		/*
-		 * Saxey Lines
-		 */
+		* Saxey Lines
+		*/
 		List<ILineRenderData> saxeyLines = new();
 		if (Options.LineSelections.SaxeyDiagram)
 		{

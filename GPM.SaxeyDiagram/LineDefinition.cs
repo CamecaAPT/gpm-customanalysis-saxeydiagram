@@ -57,6 +57,13 @@ public class LineDefinition : BindableBase, IEquatable<LineDefinition>
 		}
 	}
 
+	private bool isDissociation = false;
+	public bool IsDissociation
+	{
+		get => isDissociation;
+		set => SetProperty(ref isDissociation, value);
+	}
+
 	private bool isVisible = true;
 	public bool IsVisible
 	{

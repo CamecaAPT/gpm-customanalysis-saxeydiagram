@@ -199,6 +199,58 @@ public static class SaxeyAddons
 		}
 	}
 
+	public static (List<Vector3[]>, List<string>, List<Color>) GetDissociationLine(LinesOptions linesOptions, LineDefinition lineDef, (int, int) chargePair)
+	{
+		List<Vector3[]> pointsList = new();
+		List<string> namesList = new();
+		List<Color> colorsList = new();
+
+		var symbolToMassDict1 = MakeSymbolToMassDict(linesOptions, new() { lineDef.Ion1 }, new() { chargePair.Item1 });
+		var symbolToMassDict2 = MakeSymbolToMassDict(linesOptions, new() { lineDef.Ion2 }, new() { chargePair.Item2 });
+
+		const float step = .01f;
+
+		foreach (var mass1 in symbolToMassDict1[lineDef.Ion1])
+		{
+			var ma = mass1 * chargePair.Item1;
+			var na = chargePair.Item1;
+			foreach(var mass2 in symbolToMassDict2[lineDef.Ion2])
+			{
+				List<Vector3> line = new();
+
+				var mb = mass2 * chargePair.Item2;
+				var nb = chargePair.Item2;
+
+				if(mass1 > mass2)
+				{
+					var tempM = mb;
+					var tempN = nb;
+					mb = ma;
+					nb = na;
+					ma = tempM;
+					na = tempN;
+				}
+
+				double t = 0;
+				double x;
+				double y;
+				do
+				{
+					x = ma / ((ma / (ma + mb) * t * (na + nb) + (1 - t) * na));
+					y = mb / ((mb / (ma + mb) * t * (na + nb) + (1 - t) * nb));
+					line.Add(new((float)x, -1, (float)y));
+					t += step;
+				} while (t <= 1);
+
+				pointsList.Add(line.ToArray());
+				namesList.Add(lineDef.Display);
+				colorsList.Add(lineDef.Color);
+			}
+		}
+
+
+		return (pointsList, namesList, colorsList);
+	}
 
 	public static (List<Vector3[]>, List<string>, List<Color>) GetLinesSaxey(LinesOptions linesOptions, List<LineDefinition> selectedSymbols, List<(int, int)> selectedCharges, float maxHeight)
 	{
@@ -213,6 +265,14 @@ public static class SaxeyAddons
 		List<Color> selectedColors = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
+			if (selectedSymbols[i].IsDissociation)
+			{
+				(var points, var name, var color) = GetDissociationLine(linesOptions, selectedSymbols[i], selectedCharges[i]);
+				lines.AddRange(points);
+				lineLabels.AddRange(name);
+				lineColors.AddRange(color);
+			}
+
 			if (!selectedSymbols[i].IsVisible) continue;
 
 			selectedSymbols1.Add(selectedSymbols[i].Ion1);
