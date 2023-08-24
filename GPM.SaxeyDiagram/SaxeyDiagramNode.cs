@@ -117,6 +117,11 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
             using var stringReader = new StringReader(xmlData);
             if (serializer.Deserialize(stringReader) is SaxeyDiagramOptions loadedOptions)
             {
+				foreach(var line in loadedOptions.IonSelections)
+				{
+					line.SetColor(line.Color);
+				}
+
             	Options = loadedOptions;
             }
 		}

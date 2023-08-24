@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Xml.Linq;
 using Cameca.CustomAnalysis.Interface;
 using Cameca.CustomAnalysis.Utilities;
@@ -113,10 +114,27 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			RunCommand.Execute(null);
 	}
 
+	public Color PickColor(Color originalColor, Rectangle rect)
+	{
+		ColorPickerView window = new(originalColor);
+		window.WindowStartupLocation = WindowStartupLocation.Manual;
+		var point = rect.PointToScreen(Mouse.GetPosition(rect));
+		window.Top = point.Y;
+		window.Left = point.X;
+		window.ShowDialog();
+		return ((ColorPickerViewModel)window.DataContext).Color.Color;
+	}
+
 	public void UpdateLines()
 	{
 		if (saxeyViewModel == null || sideBySideViewModel == null || linesOptions == null || histogramMaxHeight == null)
 			return;
+
+		//update colors
+		foreach(var line in Options.IonSelections)
+		{
+			line.Color = line.LineColor.Color;
+		}
 
 		//clear lines
 		while(saxeyViewModel.Histogram2DRenderData.Count > 1)
@@ -134,9 +152,9 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		List<ILineRenderData> saxeyLines = new();
 		if (Options.LineSelections.SaxeyDiagram)
 		{
-			(var lineSaxeyPoints, var saxeyLabels) = SaxeyAddons.GetLinesSaxey((LinesOptions)linesOptions, SelectedIons.ToList(), ChargeCounts, Options.MassExtent);
+			(var lineSaxeyPoints, var saxeyLabels, var lineColors) = SaxeyAddons.GetLinesSaxey((LinesOptions)linesOptions, SelectedIons.ToList(), ChargeCounts, Options.MassExtent);
 			for(int i=0; i<lineSaxeyPoints.Count; i++)
-				saxeyLines.Add(renderDataFactory.CreateLine(lineSaxeyPoints[i], Colors.Red, 3f, saxeyLabels[i]));
+				saxeyLines.Add(renderDataFactory.CreateLine(lineSaxeyPoints[i], lineColors[i], 3f, saxeyLabels[i]));
 		}
 		saxeyViewModel.Histogram2DRenderData.AddRange(saxeyLines);
 
@@ -146,9 +164,9 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		List<ILineRenderData> lines2D = new();
 		if (Options.LineSelections.LinearizedDiagram)
 		{
-			(var line2DPoints, var lineNames) = SaxeyAddons.GetLines2D((LinesOptions)linesOptions, SelectedIons.ToList(), ChargeCounts, Options.MassExtent);
+			(var line2DPoints, var lineNames, var lineColors) = SaxeyAddons.GetLines2D((LinesOptions)linesOptions, SelectedIons.ToList(), ChargeCounts, Options.MassExtent);
 			for(int i=0; i<line2DPoints.Count; i++)
-				lines2D.Add(renderDataFactory.CreateLine(line2DPoints[i], Colors.Red, 3f, lineNames[i]));
+				lines2D.Add(renderDataFactory.CreateLine(line2DPoints[i], lineColors[i], 3f, lineNames[i]));
 		}
 		sideBySideViewModel.Histogram2DRenderData.AddRange(lines2D);
 
@@ -159,9 +177,9 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		if (Options.LineSelections.CalculatedMassSpectrum)
 		{
 			int maxHeight = (int)histogramMaxHeight;
-			(var line1DPoints, var lineNames) = SaxeyAddons.GetLines1D((LinesOptions)linesOptions, SelectedIons.ToList(), ChargeCounts, maxHeight);
+			(var line1DPoints, var lineNames, var lineColors) = SaxeyAddons.GetLines1D((LinesOptions)linesOptions, SelectedIons.ToList(), ChargeCounts, maxHeight);
 			for(int i=0; i<line1DPoints.Count; i++)
-				lines1D.Add(renderDataFactory.CreateLine(line1DPoints[i], Colors.Red, 3f, lineNames[i]));
+				lines1D.Add(renderDataFactory.CreateLine(line1DPoints[i], lineColors[i], 3f, lineNames[i]));
 		}
 		sideBySideViewModel.Histogram1DRenderData.AddRange(lines1D);
 	}
@@ -194,7 +212,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 				else
 					ionToAdd2 = IonName2;
 
-				LineDefinition lineDef = new(ionToAdd1, ionToAdd2);
+				LineDefinition lineDef = new(ionToAdd1, ionToAdd2, Colors.Red);
 
 				if (SelectedIons.Contains(lineDef))
 					MessageBox.Show("Ion Pair Already Added");

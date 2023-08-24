@@ -4,16 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Xml.Serialization;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
 
 public class LineDefinition : BindableBase, IEquatable<LineDefinition>
 {
-	public LineDefinition(string ion1, string ion2, bool isVisible = true)
+	public LineDefinition(string ion1, string ion2, Color lineColor, bool isVisible = true)
 	{
 		Ion1 = ion1;
 		Ion2 = ion2;
 		IsVisible = isVisible;
+		color = lineColor;
+		LineColor = new(lineColor);
 		UpdateDisplay();
 	}
 
@@ -58,6 +62,28 @@ public class LineDefinition : BindableBase, IEquatable<LineDefinition>
 	{
 		get => isVisible;
 		set => SetProperty(ref isVisible, value);
+	}
+
+	private Color color;
+	public Color Color
+	{
+		get => color;
+		set => SetProperty(ref color, value);
+	}
+
+	[XmlIgnore]
+	private SolidColorBrush lineColor = new(Colors.Black);
+	[XmlIgnore]
+	public SolidColorBrush LineColor
+	{
+		get => lineColor;
+		set => SetProperty(ref lineColor, value);
+	}
+
+	public void SetColor(Color color)
+	{
+		LineColor.Color = color;
+		Color = color;
 	}
 
 	private void UpdateDisplay()

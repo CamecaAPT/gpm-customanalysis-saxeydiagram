@@ -197,15 +197,17 @@ public static class SaxeyAddons
 	}
 
 
-	public static (List<Vector3[]>, List<string>) GetLinesSaxey(LinesOptions linesOptions, List<LineDefinition> selectedSymbols, List<(int, int)> selectedCharges, float maxHeight)
+	public static (List<Vector3[]>, List<string>, List<Color>) GetLinesSaxey(LinesOptions linesOptions, List<LineDefinition> selectedSymbols, List<(int, int)> selectedCharges, float maxHeight)
 	{
 		List<Vector3[]> lines = new();
 		List<string> lineLabels = new();
+		List<Color> lineColors = new();
 
 		List<string> selectedSymbols1 = new();
 		List<string> selectedSymbols2 = new();
 		List<int> selectedCharges1 = new();
 		List<int> selectedCharges2 = new();
+		List<Color> selectedColors = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
 			if (!selectedSymbols[i].IsVisible) continue;
@@ -215,6 +217,8 @@ public static class SaxeyAddons
 
 			selectedCharges1.Add(selectedCharges[i].Item1);
 			selectedCharges2.Add(selectedCharges[i].Item2);
+
+			selectedColors.Add(selectedSymbols[i].LineColor.Color);
 		}
 
 		var symbolToMassDict1 = MakeSymbolToMassDict(linesOptions, selectedSymbols1, selectedCharges1);
@@ -264,24 +268,28 @@ public static class SaxeyAddons
 						sb.Append(')');
 
 						lineLabels.Add(sb.ToString());
+
+						lineColors.Add(selectedColors[i]);
 					}
 				}
 			}
 		}
 
-		return (lines, lineLabels);
+		return (lines, lineLabels, lineColors);
 	}
 
-	public static (List<Vector3[]>, List<string>) GetLines2D(LinesOptions linesOptions, List<LineDefinition> selectedSymbols, List<(int, int)> selectedCharges, float height)
+	public static (List<Vector3[]>, List<string>, List<Color>) GetLines2D(LinesOptions linesOptions, List<LineDefinition> selectedSymbols, List<(int, int)> selectedCharges, float height)
 	{
 		List<Vector3[]> lines = new();
 		List<string> lineLabels = new();
+		List<Color> lineColors = new();
 		float h = (float)Math.Sqrt(height);
 
 		List<string> selectedSymbols1 = new();
 		List<string> selectedSymbols2 = new();
 		List<int> selectedCharges1 = new();
 		List<int> selectedCharges2 = new();
+		List<Color> selectedColors = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
 			if (!selectedSymbols[i].IsVisible) continue;
@@ -291,6 +299,8 @@ public static class SaxeyAddons
 
 			selectedCharges1.Add(selectedCharges[i].Item1);
 			selectedCharges2.Add(selectedCharges[i].Item2);
+
+			selectedColors.Add(selectedSymbols[i].LineColor.Color);
 		}
 
 		var symbolToMassDict1 = MakeSymbolToMassDict(linesOptions, selectedSymbols1, selectedCharges1);
@@ -333,24 +343,28 @@ public static class SaxeyAddons
 						sb.Append(')');
 
 						lineLabels.Add(sb.ToString());
+
+						lineColors.Add(selectedColors[i]);
 					}
 				}
 			}
 		}
 
 
-		return (lines, lineLabels);
+		return (lines, lineLabels, lineColors);
 	}
 
-	public static (List<Vector3[]>, List<string>) GetLines1D(LinesOptions linesOptions, List<LineDefinition> selectedSymbols, List<(int, int)> selectedCharges, int maxHeight)
+	public static (List<Vector3[]>, List<string>, List<Color>) GetLines1D(LinesOptions linesOptions, List<LineDefinition> selectedSymbols, List<(int, int)> selectedCharges, int maxHeight)
 	{
 		List<Vector3[]> lines = new();
 		List<string> lineLabels = new();
+		List<Color> lineColors = new();
 
 		List<string> selectedSymbols1 = new();
 		List<string> selectedSymbols2 = new();
 		List<int> selectedCharges1 = new();
 		List<int> selectedCharges2 = new();
+		List<Color> selectedColors = new();
 		for (int i = 0; i < selectedSymbols.Count; i++)
 		{
 			if (!selectedSymbols[i].IsVisible) continue;
@@ -360,6 +374,8 @@ public static class SaxeyAddons
 
 			selectedCharges1.Add(selectedCharges[i].Item1);
 			selectedCharges2.Add(selectedCharges[i].Item2);
+
+			selectedColors.Add(selectedSymbols[i].LineColor.Color);
 		}
 
 		var symbolToMassDict1 = MakeSymbolToMassDict(linesOptions, selectedSymbols1, selectedCharges1);
@@ -404,12 +420,14 @@ public static class SaxeyAddons
 						sb.Append(')');
 
 						lineLabels.Add(sb.ToString());
+
+						lineColors.Add(selectedColors[i]);
 					}
 				}
 			}
 		}
 
-		return (lines, lineLabels);
+		return (lines, lineLabels, lineColors);
 	}
 
 
