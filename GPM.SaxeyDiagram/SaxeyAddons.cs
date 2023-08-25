@@ -199,7 +199,7 @@ public static class SaxeyAddons
 		}
 	}
 
-	public static (List<Vector3[]>, List<string>, List<Color>) GetDissociationLine(LinesOptions linesOptions, LineDefinition lineDef, (int, int) chargePair)
+	public static (List<Vector3[]>, List<string>, List<Color>) GetDissociationLine(LinesOptions linesOptions, LineDefinition lineDef, (int, int) chargePair, float maxY)
 	{
 		List<Vector3[]> pointsList = new();
 		List<string> namesList = new();
@@ -233,14 +233,19 @@ public static class SaxeyAddons
 
 				double t = 0;
 				double x;
-				double y;
-				do
+				double y = mb / ((mb / (ma + mb) * t * (na + nb) + (1 - t) * nb));
+				
+				if (y > maxY)
+					t = (mb - (nb * maxY)) / ((mb / (ma + mb)) * (na + nb) * maxY - (nb * maxY));
+
+				while (t < 1)
 				{
 					x = ma / ((ma / (ma + mb) * t * (na + nb) + (1 - t) * na));
 					y = mb / ((mb / (ma + mb) * t * (na + nb) + (1 - t) * nb));
+
 					line.Add(new((float)x, -1, (float)y));
 					t += step;
-				} while (t <= 1);
+				}
 
 				pointsList.Add(line.ToArray());
 
@@ -279,7 +284,7 @@ public static class SaxeyAddons
 		{
 			if (selectedSymbols[i].IsDissociation)
 			{
-				(var points, var name, var color) = GetDissociationLine(linesOptions, selectedSymbols[i], selectedCharges[i]);
+				(var points, var name, var color) = GetDissociationLine(linesOptions, selectedSymbols[i], selectedCharges[i], maxHeight);
 				lines.AddRange(points);
 				lineLabels.AddRange(name);
 				lineColors.AddRange(color);
