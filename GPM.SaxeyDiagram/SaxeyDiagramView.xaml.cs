@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -36,4 +37,15 @@ public partial class SaxeyDiagramView : UserControl
 
 		((SaxeyDiagramViewModel)DataContext).UpdateLines();
 	}
+
+	private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+	{
+		if (!(sender is Button button))
+			return;
+
+		if (!(button.DataContext is LineDefinition lineDef))
+			return;
+
+		((SaxeyDiagramViewModel)DataContext).OnListViewDoubleClick(lineDef);
+    }
 }

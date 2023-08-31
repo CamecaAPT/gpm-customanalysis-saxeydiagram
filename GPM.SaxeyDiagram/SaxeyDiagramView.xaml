@@ -73,16 +73,12 @@
                     </Grid>
                     <Button Content="Remove Ions" Grid.Row="4" Command="{Binding RemoveLinesCommand}"/>
                     <ListBox Grid.Row="5" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}" HorizontalContentAlignment="Stretch">
-                        <b:Interaction.Triggers>
-                            <b:EventTrigger EventName="MouseDoubleClick">
-                                <b:InvokeCommandAction Command="{Binding ListViewDoubleClick}"/>
-                            </b:EventTrigger>
-                        </b:Interaction.Triggers>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="Auto"/>
@@ -92,6 +88,7 @@
                                     <CheckBox Grid.Column="1" Content="Dissociation" IsChecked="{Binding IsDissociation}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
                                     <Rectangle Grid.Column="2" Fill="{Binding LineColor}" Height="20" Width="20" Margin="5,0,5,0" MouseDown="Rectangle_MouseDown"/>
                                     <CheckBox Grid.Column="3" Content="Show" IsChecked="{Binding IsVisible}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
+                                    <Button Grid.Column="4" Content="X" Click="Button_Click" Margin="5,0,5,0"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>

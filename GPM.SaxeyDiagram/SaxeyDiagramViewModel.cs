@@ -70,9 +70,6 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 
 	public LineDefinition? ListBoxSelection { get; set; } = null;
 
-	private readonly RelayCommand listViewDoubleClick;
-	public ICommand ListViewDoubleClick => listViewDoubleClick;
-
 	public SaxeyDiagramOptions Options => Node?.Options ?? new ();
 
 	public ObservableCollection<object> Tabs { get; } = new();
@@ -94,7 +91,6 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		colorMap = CreateBrightColorMap(colorMapFactory);
 		addLine = new RelayCommand(OnAddLine);
 		removeLines = new RelayCommand(OnRemoveLines);
-		listViewDoubleClick = new RelayCommand(OnListViewDoubleClick);
 	}
 
 	protected override void OnCreated(ViewModelCreatedEventArgs eventArgs)
@@ -229,10 +225,9 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		}
 	}
 
-	public void OnListViewDoubleClick()
+	public void OnListViewDoubleClick(LineDefinition lineDef)
 	{
-		if(ListBoxSelection == null) return;
-		var index = SelectedIons.IndexOf(ListBoxSelection);
+		var index = SelectedIons.IndexOf(lineDef);
 		//if index found
 		if (index != -1)
 		{
