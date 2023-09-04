@@ -124,6 +124,7 @@
                                           AxisYLabel="sqrt(M/n) (da)"
                               Grid.Column ="0"/>
                         <controls:Chart2D DataSource="{Binding Histogram1DRenderData}"
+                                          IsLogScaleY="True"
                                           AxisXLabel="Delta Time of Flight Squared"
                                           AxisYLabel="Ions" 
                                           IsLogScaleY="True"
