@@ -126,6 +126,7 @@
                         <controls:Chart2D DataSource="{Binding Histogram1DRenderData}"
                                           AxisXLabel="Delta Time of Flight Squared"
                                           AxisYLabel="Ions" 
+                                          IsLogScaleY="True"
                               Grid.Column ="1"/>
 
                     </Grid>
