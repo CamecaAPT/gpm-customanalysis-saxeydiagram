@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="GPM.CustomAnalysis.SaxeyDiagram.RangeTableView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GPM.CustomAnalysis.SaxeyDiagram"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type={x:Type local:RangeTableViewModel}}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Content="Ion Names (e.g.GaN3++ or H2)" HorizontalContentAlignment="Center"/>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Row="0" Grid.Column="0" Content="Remove All X" Command="{Binding RemoveAllX}"/>
+                <Button Grid.Row="0" Grid.Column="1" Content="Remove All Y" Command="{Binding RemoveAllY}"/>
+
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding TextBoxX, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Command="{Binding EnterPressedX}" Key="Return"/>
+                        <KeyBinding Command="{Binding EnterPressedX}" Key="Enter"/>
+                    </TextBox.InputBindings>
+                </TextBox>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TextBoxY, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Command="{Binding EnterPressedY}" Key="Return"/>
+                        <KeyBinding Command="{Binding EnterPressedY}" Key="Enter"/>
+                    </TextBox.InputBindings>
+                </TextBox>
+             
+                <ListBox Grid.Row="2" Grid.Column="0" ItemsSource="{Binding XIons}" SelectedItem="{Binding SelectionX}" MouseDoubleClick="ListBox_MouseDoubleClickX" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+                <ListBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding YIons}" SelectedItem="{Binding SelectionY}" MouseDoubleClick="ListBox_MouseDoubleClickY" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+            </Grid>
+        </Grid>
+
+        <DataGrid Grid.Column="2" ItemsSource="{Binding RangeTable}" AutoGenerateColumns="{Binding AutoGenerateColumns}" HeadersVisibility="None"/>
+    </Grid>
+</UserControl>

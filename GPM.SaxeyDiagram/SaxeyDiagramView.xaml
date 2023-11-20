@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:Cameca.Extensions.Controls;assembly=Cameca.Extensions.Controls"
              xmlns:local="clr-namespace:GPM.CustomAnalysis.SaxeyDiagram"
              mc:Ignorable="d"
@@ -16,7 +17,7 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="300" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
@@ -24,13 +25,24 @@
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <Button Grid.Row="0"
                     Command="{Binding RunCommand}"
                     Content="Run" />
-            <controls:PropertyGrid Grid.Row="1" 
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <controls:PropertyGrid Grid.Row="0" 
                                    SelectedObject="{Binding Options}"
                                    ShowCategories="False"
                                    ShowEditorButtons="False"
@@ -38,6 +50,51 @@
                                    ShowSearchBox="False"
                                    ExpandButtonsVisibility="Visible"
                                    ExpandCategoriesWhenSelectedObjectChanged="True" />
+                    <Button Content="Add Ion" Grid.Row="1" Command="{Binding AddLineCommand}" />
+                    <Label Grid.Row="2" Content="Ion Names (e.g.GaN3++ or H2)"/>
+                    <Grid Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0" Text="{Binding IonName1, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="{Binding AddLineCommand}" Key="Return"/>
+                                <KeyBinding Command="{Binding AddLineCommand}" Key="Enter"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        <TextBox Grid.Column="1" Text="{Binding IonName2, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="{Binding AddLineCommand}" Key="Return"/>
+                                <KeyBinding Command="{Binding AddLineCommand}" Key="Enter"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </Grid>
+                    <Button Content="Remove Ions" Grid.Row="4" Command="{Binding RemoveLinesCommand}"/>
+                    <ListBox Grid.Row="5" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}" HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0" Text="{Binding Display}"/>
+                                    <CheckBox Grid.Column="1" Content="Dissociation" IsChecked="{Binding IsDissociation}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
+                                    <Rectangle Grid.Column="2" Fill="{Binding LineColor}" Height="20" Width="20" Margin="5,0,5,0" MouseDown="Rectangle_MouseDown"/>
+                                    <CheckBox Grid.Column="3" Content="Show" IsChecked="{Binding IsVisible}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
+                                    <Button Grid.Column="4" Content="X" Click="Button_Click" Margin="5,0,5,0"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </ScrollViewer>
         </Grid>
 
         <GridSplitter Grid.Column="1"
@@ -56,10 +113,28 @@
                                HorizontalAlignment="Left"
                                TextWrapping="WrapWithOverflow" />
                 </DataTemplate>
+                <DataTemplate DataType="{x:Type local:Histogram2DHistogram1DSideBySideViewModel}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <controls:Histogram2D DataSource="{Binding Histogram2DRenderData}"
+                                          AxisXLabel="sqrt(M/n) (da)"
+                                          AxisYLabel="sqrt(M/n) (da)"
+                              Grid.Column ="0"/>
+                        <controls:Chart2D DataSource="{Binding Histogram1DRenderData}"
+                                          AxisXLabel="Delta Time of Flight Squared"
+                                          AxisYLabel="Ions" 
+                                          IsLogScaleY="True"
+                                          Grid.Column ="1"/>
+
+                    </Grid>
+                </DataTemplate>
                 <DataTemplate DataType="{x:Type local:Histogram2DContentViewModel}">
                     <controls:Histogram2D DataSource="{Binding Histogram2DRenderData}"
                                           AxisXLabel="M/n (da)"
-                                          AxisYLabel="M/n (da)" />
+                                          AxisYLabel="M/n (da)"/>
                 </DataTemplate>
             </TabControl.Resources>
         </TabControl>

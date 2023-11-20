@@ -1,4 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
 /// <summary>
@@ -10,4 +13,39 @@ public partial class SaxeyDiagramView : UserControl
 	{
 		InitializeComponent();
 	}
+
+	private void CheckBox_Checked(object sender, System.Windows.RoutedEventArgs e)
+	{
+		((SaxeyDiagramViewModel)DataContext).UpdateLines();
+	}
+
+	private void CheckBox_Unchecked(object sender, System.Windows.RoutedEventArgs e)
+	{
+		((SaxeyDiagramViewModel)DataContext).UpdateLines();
+	}
+
+	private void Rectangle_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+	{
+		if (!(sender is Rectangle rect))
+			return;
+
+		if (!(rect.Fill is SolidColorBrush colorBrush))
+			return;
+
+
+		colorBrush.Color = ((SaxeyDiagramViewModel)DataContext).PickColor(colorBrush.Color, rect);
+
+		((SaxeyDiagramViewModel)DataContext).UpdateLines();
+	}
+
+	private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+	{
+		if (!(sender is Button button))
+			return;
+
+		if (!(button.DataContext is LineDefinition lineDef))
+			return;
+
+		((SaxeyDiagramViewModel)DataContext).OnListViewDoubleClick(lineDef);
+    }
 }

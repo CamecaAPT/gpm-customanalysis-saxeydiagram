@@ -1,5 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.Windows.Documents;
 using System.Xml.Serialization;
+using Cameca.CustomAnalysis.Interface;
 using Prism.Mvvm;
 
 namespace GPM.CustomAnalysis.SaxeyDiagram;
@@ -72,5 +76,80 @@ public class SaxeyDiagramOptions : BindableBase
 	{
 		get => exportToCsv;
 		set => SetProperty(ref exportToCsv, value);
+	}
+
+	private bool mirrorPlot = false;
+	[Display(Name = "Mirror Plot", Description = "Leave the bottom half of the plot blank or have a copy of the top reflected.")]
+	public bool MirrorPlot
+	{
+		get => mirrorPlot;
+		set => SetProperty(ref mirrorPlot, value);
+	}
+
+	private float dtofBinSize = .01f;
+	[Display(Name = "DToF Mass Spec Bin Size", Description = "Bin size for the calculated mass spectrum (Delta Time of Flight Squared)")]
+	public float DToFBinSize
+	{
+		get => dtofBinSize;
+		set => SetProperty(ref dtofBinSize, value);
+	}
+
+	[Display(Name = "Where to show lines", Description = "Which graphs to render lines onto.")]
+	public LineSelections LineSelections { get; set; } = new LineSelections();
+
+	private int rangeTableDecimalPlaces = 1;
+	[Display(Name = "Range Table Decimal Places")]
+	public int RangeTableDecimalPlaces
+	{
+		get => rangeTableDecimalPlaces;
+		set => SetProperty(ref rangeTableDecimalPlaces, value);
+	}
+
+	private ObservableCollection<LineDefinition> ionSelections = new();
+	[Display(AutoGenerateField = false)]
+	public ObservableCollection<LineDefinition> IonSelections
+	{
+		get => ionSelections;
+		set => SetProperty(ref ionSelections, value);
+	}
+
+	private List<(int, int)> chargeCounts = new();
+	[Display(AutoGenerateField = false)]
+	public List<(int, int)> ChargeCounts
+	{
+		get => chargeCounts;
+		set => SetProperty(ref chargeCounts, value);
+	}
+
+	private List<int> rangeTableXCharges = new();
+	[Display(AutoGenerateField = false)]
+	public List<int> RangeTableXCharges
+	{ 
+		get => rangeTableXCharges;
+		set => SetProperty(ref rangeTableXCharges, value);
+	}
+
+	private List<int> rangeTableYCharges = new();
+	[Display(AutoGenerateField = false)]
+	public List<int> RangeTableYCharges
+	{
+		get => rangeTableYCharges;
+		set => SetProperty(ref rangeTableYCharges, value);
+	}
+
+	private ObservableCollection<string> rangeTableXIons = new();
+	[Display(AutoGenerateField = false)]
+	public ObservableCollection<string> RangeTableXIons
+	{
+		get => rangeTableXIons;
+		set => SetProperty(ref rangeTableXIons, value);
+	}
+
+	private ObservableCollection<string> rangeTableYIons = new();
+	[Display(AutoGenerateField = false)]
+	public ObservableCollection<string> RangeTableYIons
+	{
+		get => rangeTableYIons;
+		set => SetProperty(ref rangeTableYIons, value);
 	}
 }
