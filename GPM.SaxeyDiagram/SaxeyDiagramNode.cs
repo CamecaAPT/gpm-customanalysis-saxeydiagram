@@ -43,6 +43,14 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 	public List<string> IonLineAndChartSelection { get; set; } = new();
 
+	// [0] = Map
+	// [1] = sqrtChart
+	// [2] = newResolution
+	// [3] = multisChart
+	// [4] = maxHeight
+	// [5] = elementDataset
+	// [6] = _ionFormulaIsotopeCalculator
+
 	public async Task<List<object>?> Run()
 	{
 		List<object> toRet = new();
@@ -89,7 +97,14 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 		if (Options.ExportToCsv)
 		{
 			var csvName = ionData.Filename + ".SP.csv";
-			saxey.ExportToCsvTable(csvName, out string? err);
+			if (Options.ExportRawMap)
+			{
+				saxey.ExportToCsvTable(csvName, saxey.RawMap, out string? err);
+			}
+			else
+			{
+				saxey.ExportToCsvTable(csvName, saxey.Map, out string? err);
+			}
 		}
 
 

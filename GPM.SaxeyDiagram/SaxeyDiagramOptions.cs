@@ -78,6 +78,14 @@ public class SaxeyDiagramOptions : BindableBase
 		set => SetProperty(ref exportToCsv, value);
 	}
 
+	private bool exportRawMap = false;
+	[Display(Name = "Export Raw Counts", Description = "CSV export will not normalize bin counts.")]
+	public bool ExportRawMap
+	{
+		get => exportRawMap;
+		set => SetProperty(ref exportRawMap, value);
+	}
+
 	private bool mirrorPlot = false;
 	[Display(Name = "Mirror Plot", Description = "Leave the bottom half of the plot blank or have a copy of the top reflected.")]
 	public bool MirrorPlot
