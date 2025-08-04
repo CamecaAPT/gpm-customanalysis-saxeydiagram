@@ -42,6 +42,7 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 	public SaxeyDiagramOptions Options { get; private set; } = new();
 
 	public List<string> IonLineAndChartSelection { get; set; } = new();
+	public string ExportCSVFullPath { get; set; } = "";
 
 	// [0] = Map
 	// [1] = sqrtChart
@@ -62,6 +63,11 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 		if (!(IsIonDataValid(ionData)))
 		{
 			return null;
+		}
+
+		if (ExportCSVFullPath == "")
+		{
+			ExportCSVFullPath = ionData.Filename + ".SP.csv";
 		}
 
 		bool hasMultiplicity = sectionInfo.Contains("Multiplicity");
@@ -96,14 +102,13 @@ internal class SaxeyDiagramNode : AnalysisNodeBase
 
 		if (Options.ExportToCsv)
 		{
-			var csvName = ionData.Filename + ".SP.csv";
 			if (Options.ExportRawMap)
 			{
-				saxey.ExportToCsvTable(csvName, saxey.RawMap, out string? err);
+				saxey.ExportToCsvTable(ExportCSVFullPath, saxey.RawMap, out string? err);
 			}
 			else
 			{
-				saxey.ExportToCsvTable(csvName, saxey.Map, out string? err);
+				saxey.ExportToCsvTable(ExportCSVFullPath, saxey.Map, out string? err);
 			}
 		}
 
