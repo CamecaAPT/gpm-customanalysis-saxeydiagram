@@ -18,6 +18,7 @@ internal class CSaxeyDiagram
 	private SaxeyDiagramOptions? nullableOptions = null;
 	private SaxeyDiagramOptions options => nullableOptions ?? throw new InvalidOperationException($"{nameof(CSaxeyDiagram)}.{nameof(Build)} must be called before running this analysis");
 
+	public float[] RawMap { get; private set; } = Array.Empty<float>();
 	public float[] Map { get; private set; } = Array.Empty<float>();
 	public List<Vector2> Points { get; private set; } = new();
 
@@ -35,11 +36,12 @@ internal class CSaxeyDiagram
 		{
 			BuildFromPulseSection(ionData);
 		}
+		RawMap = (float[])Map.Clone();
 
 		Log10ScaleTransformation(Map);
 		NormalizeMap(Map);
-
 		ReplaceLowerValues(MinBinValueInclusive, ReplacedOutOfRangeBinValue);
+
 	}
 
 	private void BuildFromMultiplicitySection(IIonData ionData)
@@ -224,7 +226,7 @@ internal class CSaxeyDiagram
 	/// </summary>
 	/// <param name="filename"></param>
 	/// <param name="error">Error text if failure (CSV open, for instance)</param>
-	internal bool ExportToCsvTable(string filename, [NotNullWhen(false)] out string? error)
+	internal bool ExportToCsvTable(string filename, float[] map, [NotNullWhen(false)] out string? error)
 	{
 
 		try
@@ -253,10 +255,8 @@ internal class CSaxeyDiagram
 				writer.Write(x);
 				for (int j = 0; j < options.EdgeSize; j++)
 				{
-
 					writer.Write(',');
-					writer.Write(Map[j * options.EdgeSize + i]);
-
+					writer.Write(map[j * options.EdgeSize + i]);
 				}
 
 				writer.Write(writer.NewLine);

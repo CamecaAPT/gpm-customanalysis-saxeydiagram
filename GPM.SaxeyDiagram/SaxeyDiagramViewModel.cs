@@ -73,7 +73,14 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	public SaxeyDiagramOptions Options => Node?.Options ?? new ();
 
 	public ObservableCollection<object> Tabs { get; } = new();
-	
+
+	private string exportCSVFullPath = "";
+	public string ExportCSVFullPath 
+	{ 
+		get => exportCSVFullPath; 
+		set => SetProperty(ref exportCSVFullPath, value); 
+	}
+
 	private object? selectedTab;
 	public object? SelectedTab
 	{
@@ -336,6 +343,9 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 		Tabs.Add(rangeTableView);
 
 		UpdateLines();
+
+		// CSV Name Tooltip
+		ExportCSVFullPath = Node.ExportCSVFullPath;
 
 		SelectedTab = histogram2DViewModel;
 	}

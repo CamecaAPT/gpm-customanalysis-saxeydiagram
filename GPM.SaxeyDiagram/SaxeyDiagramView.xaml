@@ -39,6 +39,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
@@ -50,9 +51,13 @@
                                    ShowSearchBox="False"
                                    ExpandButtonsVisibility="Visible"
                                    ExpandCategoriesWhenSelectedObjectChanged="True" />
-                    <Button Content="Add Ion" Grid.Row="1" Command="{Binding AddLineCommand}" />
-                    <Label Grid.Row="2" Content="Ion Names (e.g.GaN3++ or H2)"/>
-                    <Grid Grid.Row="3">
+                    <StackPanel Orientation="Horizontal" Grid.Row="1">
+                        <Label Content="CSV Path:"/>
+                        <TextBox Text="{Binding ExportCSVFullPath, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"  />
+                    </StackPanel>
+                    <Button Content="Add Ion" Grid.Row="2" Command="{Binding AddLineCommand}" />
+                    <Label Grid.Row="3" Content="Ion Names (e.g.GaN3++ or H2)"/>
+                    <Grid Grid.Row="4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -71,8 +76,8 @@
                             </TextBox.InputBindings>
                         </TextBox>
                     </Grid>
-                    <Button Content="Remove Ions" Grid.Row="4" Command="{Binding RemoveLinesCommand}"/>
-                    <ListBox Grid.Row="5" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}" HorizontalContentAlignment="Stretch">
+                    <Button Content="Remove Ions" Grid.Row="5" Command="{Binding RemoveLinesCommand}"/>
+                    <ListBox Grid.Row="6" ItemsSource="{Binding SelectedIons}" SelectedItem="{Binding ListBoxSelection}" HorizontalContentAlignment="Stretch">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
