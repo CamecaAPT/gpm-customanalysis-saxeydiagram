@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
@@ -12,7 +10,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Xml.Linq;
 using Cameca.CustomAnalysis.Interface;
 using Cameca.CustomAnalysis.Utilities;
 using CommunityToolkit.HighPerformance;
@@ -354,7 +351,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 	{
 		if (e.PropertyName == nameof(SaxeyDiagramOptions.PlotZeroAsWhite))
 		{
-			colorMap.OutOfRangeBottom = Options.PlotZeroAsWhite ? Colors.White : colorMap.Bottom;
+			colorMap.Bottom = Options.PlotZeroAsWhite ? Colors.White : Colors.Blue;
 		}
 		else
 		{
@@ -378,7 +375,7 @@ internal class SaxeyDiagramViewModel : AnalysisViewModelBase<SaxeyDiagramNode>
 			colorMapFactory.CreateColorStop(0.55f, Colors.Yellow),
 			colorMapFactory.CreateColorStop(0.29f, Colors.Green),
 		},
-		bottom: Colors.Blue,
+		bottom: Colors.White,
 		outOfRangeBottom: Colors.Transparent,
 		nanColor: Colors.Transparent);
 }
